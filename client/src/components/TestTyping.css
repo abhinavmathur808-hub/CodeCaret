@@ -1,0 +1,4300 @@
+/* ═══════════════════════════════════════════════════════════════
+   TestTyping.css — F1 Telemetry Racing Dashboard
+   ─────────────────────────────────────────────────────────────
+   Dark high-tech racing theme scoped under .light-typing-sandbox.
+   Features: Steering wheel dashboard modules, track bar,
+   sector timing panel, race engineer radio toasts.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Google Fonts — distinct families for font selector ──────── */
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Azeret+Mono:wght@400;500&family=Courier+Prime:wght@400;700&family=Inconsolata:wght@400..700&family=Martian+Mono:wght@400;500&family=Share+Tech+Mono&family=Silkscreen:wght@400;700&family=Space+Mono:wght@400;700&family=Special+Elite&family=Syne+Mono&family=VT323&display=swap');
+
+/* ── Base wrapper — dark racing cockpit ──────────────────────── */
+.light-typing-sandbox {
+  --lts-bg: var(--cc-bg);
+  --lts-text: var(--cc-text-2);
+  --lts-text-secondary: var(--cc-text-3);
+  --lts-text-muted: var(--cc-text-4);
+  --lts-border: var(--cc-border);
+  --lts-accent: var(--cc-accent);
+  --lts-typed: var(--cc-text);
+  --lts-correct: var(--cc-text);
+  --lts-untyped: var(--cc-untyped);
+  --lts-error-bg: rgba(var(--cc-error-rgb), 0.25);
+  --lts-error-text: var(--cc-error);
+  --lts-cursor: var(--cc-accent);
+  --lts-success: var(--cc-success);
+  --lts-warning: var(--cc-warning);
+
+  /* Override tokens so RaceTrack renders dark/F1 style */
+  --color-surface: var(--cc-bg);
+  --color-surface-raised: var(--cc-surface);
+  --color-surface-overlay: var(--cc-overlay);
+  --color-border: var(--cc-border);
+  --color-accent: var(--cc-accent);
+  --color-accent-glow: rgba(var(--cc-accent-rgb), 0.35);
+  --color-error: var(--cc-error);
+  --color-untyped: var(--cc-untyped);
+  --color-text-primary: var(--cc-text-2);
+  --color-text-secondary: var(--cc-text-3);
+
+  /* Dynamic font — set via inline style from React */
+  --global-font: inherit;
+
+  background-color: var(--lts-bg);
+  color: var(--lts-text);
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--global-font, "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Pin logo to top-left ────────────────────────────────────── */
+/* The art is black line-work on transparency (public/logo-mark.png);
+   BrandLogo inverts it on dark palettes through --cc-logo-filter,
+   so no blend mode is needed to lose a background. */
+.light-typing-sandbox .lts-logo {
+  position: absolute;
+  top: 20px;
+  left: 36px;
+  z-index: 100;
+  display: block;
+  width: 196px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  opacity: 0.86;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.light-typing-sandbox .lts-logo .cc-logo {
+  width: 100%;
+}
+
+.light-typing-sandbox .lts-logo:hover {
+  opacity: 1;
+}
+
+.light-typing-sandbox .lts-logo:active {
+  transform: scale(0.98);
+}
+
+.light-typing-sandbox .lts-logo:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 4px;
+  opacity: 1;
+}
+
+/* Phones: the logo and the two corner buttons get a row of their own
+   above the telemetry strip (see .f1-dashboard under 768px) instead
+   of sitting on top of it. */
+@media (max-width: 768px) {
+  .light-typing-sandbox .lts-logo {
+    top: 12px;
+    left: 16px;
+    width: 96px;
+  }
+}
+
+/* ── Settings gear button (top-right) ────────────────────────── */
+.light-typing-sandbox .lts-settings-btn {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--cc-text-4);
+  cursor: pointer;
+  outline: none;
+  transition:
+    color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s ease;
+}
+
+.light-typing-sandbox .lts-settings-btn:hover {
+  color: var(--cc-accent-bright);
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 8px rgba(var(--cc-accent-bright-rgb), 0.45));
+  background-color: rgba(var(--cc-accent-bright-rgb), 0.06);
+}
+
+.light-typing-sandbox .lts-settings-btn:active {
+  transform: scale(0.92);
+  filter: drop-shadow(0 0 4px rgba(var(--cc-accent-bright-rgb), 0.3));
+  transition-duration: 0.08s;
+}
+
+.light-typing-sandbox .lts-settings-btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Leaderboard trophy button (absolute, left of profile) ──── */
+.light-typing-sandbox .lts-leaderboard-btn {
+  position: absolute;
+  top: 34px;
+  right: 100px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--cc-text-4);
+  cursor: pointer;
+  outline: none;
+  transition:
+    color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s ease;
+}
+
+.light-typing-sandbox .lts-leaderboard-btn:hover {
+  color: #ffd700;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.45));
+  background-color: rgba(255, 215, 0, 0.06);
+}
+
+.light-typing-sandbox .lts-leaderboard-btn:active {
+  transform: scale(0.92);
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
+  transition-duration: 0.08s;
+}
+
+.light-typing-sandbox .lts-leaderboard-btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+.light-typing-sandbox .lts-leaderboard-btn:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+/* ── Profile wrapper (anchor for absolute dropdown) ─────────── */
+.light-typing-sandbox .lts-profile-wrapper {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  z-index: 200;
+}
+
+/* Re-position button within wrapper instead of standalone */
+.light-typing-sandbox .lts-profile-wrapper .lts-settings-btn {
+  position: relative;
+  top: auto;
+  right: auto;
+}
+
+/* ── Profile dropdown menu ───────────────────────────────────── */
+.lts-profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 190px;
+  padding: 6px;
+  background: var(--cc-surface);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--cc-border);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 40px rgba(var(--cc-shadow-rgb), calc(0.55 * var(--cc-shadow-strength))),
+    0 0 0 1px rgba(var(--cc-tint-rgb), 0.04),
+    0 0 30px rgba(var(--cc-accent-rgb), 0.05);
+  animation: profileDropdownIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+  z-index: 200;
+}
+
+@keyframes profileDropdownIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ── Dropdown separator between items ────────────────────────── */
+.lts-profile-dropdown-item + .lts-profile-dropdown-item {
+  border-top: 1px solid var(--cc-elevated);
+}
+
+.lts-profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cc-text-2);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
+}
+
+.lts-profile-dropdown-item:hover {
+  background-color: rgba(var(--cc-accent-rgb), 0.10);
+  color: var(--cc-accent-bright);
+  transform: translateX(2px);
+}
+
+.lts-profile-dropdown-item:active {
+  background-color: rgba(var(--cc-accent-rgb), 0.18);
+  transform: translateX(2px) scale(0.98);
+}
+
+.lts-profile-dropdown-item svg {
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.18s ease;
+}
+
+.lts-profile-dropdown-item:hover svg {
+  opacity: 1;
+}
+
+/* ── Logged-in user header inside dropdown ────────────────────── */
+.lts-profile-dropdown-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--cc-elevated);
+  margin-bottom: 4px;
+}
+
+.lts-profile-dropdown-username {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cc-text-2);
+  letter-spacing: 0.01em;
+}
+
+.lts-profile-dropdown-email {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--cc-text-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Streak + rating chips ───────────────────────────────────
+   Sit under the username in the profile dropdown, in the display
+   face with tabular figures, so they read as instrument values. */
+.lts-streak-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.lts-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border: 1px solid var(--cc-border);
+  border-radius: 3px;
+  background: var(--cc-surface-2, rgba(255, 255, 255, 0.03));
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.lts-streak strong {
+  font-weight: 800;
+  color: var(--cc-text);
+}
+
+.lts-streak-unit {
+  color: var(--cc-text-4);
+}
+
+/* Amber rather than the accent red: the flame is a warm "kept
+   going" signal, and red already means something else everywhere
+   else in this app. */
+.lts-streak-flame {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+}
+
+.lts-streak-elo strong {
+  color: var(--cc-accent);
+}
+
+/* ── Log Out item — red accent ───────────────────────────────── */
+.lts-profile-dropdown-logout {
+  margin-top: 4px;
+  border-top: 1px solid var(--cc-elevated);
+  border-radius: 0 0 8px 8px;
+}
+
+.lts-profile-dropdown-logout:hover {
+  background-color: rgba(var(--cc-accent-rgb), 0.10);
+  color: var(--cc-error);
+}
+
+.lts-profile-dropdown-logout:hover svg {
+  opacity: 1;
+}
+
+/* ── Settings modal backdrop (blur + darken) ─────────────────── */
+.settings-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: modal-fade-in 0.25s ease forwards;
+}
+
+@keyframes modal-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ── Settings modal (centered dark panel) ────────────────────── */
+.settings-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 501;
+  width: 95vw;
+  /* Narrower than the old 1400px: at full width single label/control
+     rows stranded the control a foot away from its label. The card
+     grid below wants a measured column, not a billboard. */
+  max-width: 1120px;
+  height: 90vh;
+  max-height: 880px;
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border-strong);
+  border-radius: 4px;
+  box-shadow:
+    0 24px 80px rgba(var(--cc-shadow-rgb), calc(0.7 * var(--cc-shadow-strength))),
+    0 0 0 1px rgba(var(--cc-tint-rgb), 0.04),
+    0 0 60px rgba(var(--cc-accent-rgb), 0.08);
+  overflow: hidden;
+  animation: modal-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Chequered trim along the very top edge. */
+.settings-flag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-image:
+    linear-gradient(45deg, var(--cc-text) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--cc-text) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--cc-text) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--cc-text) 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+  opacity: 0.4;
+  z-index: 2;
+}
+
+/* Registration marks. */
+.settings-mark {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(var(--cc-tint-rgb), 0.22);
+  pointer-events: none;
+  z-index: 2;
+}
+.settings-mark-tl {
+  top: 9px;
+  left: 9px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+.settings-mark-tr {
+  top: 9px;
+  right: 9px;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+.settings-mark-bl {
+  bottom: 9px;
+  left: 9px;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+.settings-mark-br {
+  bottom: 9px;
+  right: 9px;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+@keyframes modal-slide-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ── Modal header ────────────────────────────────────────────── */
+.settings-modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--cc-border);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--cc-tint-rgb), 0.035),
+    transparent
+  );
+}
+
+.settings-head-id {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.settings-head-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--cc-accent-bright);
+  box-shadow: 0 0 8px rgba(var(--cc-accent-bright-rgb), 0.85);
+  animation: settings-led-pulse 2s ease-in-out infinite;
+}
+
+@keyframes settings-led-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.settings-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--cc-text);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* Live config summary — the state you'd otherwise hunt for. */
+.settings-head-readout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  padding: 5px 12px;
+  border: 1px solid var(--cc-border);
+  background: var(--cc-overlay);
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cc-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.settings-head-readout i {
+  width: 1px;
+  height: 9px;
+  background: var(--cc-border-strong);
+  flex-shrink: 0;
+}
+
+.settings-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--cc-border);
+  border-radius: 0;
+  color: var(--cc-text-4);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.settings-modal-close:hover {
+  color: var(--cc-text);
+  border-color: var(--cc-accent-bright);
+  background-color: rgba(var(--cc-accent-rgb), 0.12);
+}
+
+.settings-modal-close:active {
+  transform: scale(0.9);
+}
+
+/* ── Modal body ──────────────────────────────────────────────── */
+.settings-modal-body {
+  position: relative;
+  padding: 22px 26px;
+  overflow-y: auto;
+  flex: 1;
+  /* Engineering-paper grid, barely there — gives the panel a measured,
+     instrument-like surface rather than flat dark fill. */
+  background-image:
+    linear-gradient(rgba(var(--cc-tint-rgb), 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--cc-tint-rgb), 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+/* ── Card grid ───────────────────────────────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.settings-card-wide {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.settings-card {
+  position: relative;
+  padding: 16px 18px 18px;
+  background: color-mix(in srgb, var(--cc-bg-2) 72%, transparent);
+  border: 1px solid var(--cc-border);
+  border-radius: 3px;
+  transition: border-color 0.25s ease;
+}
+
+.settings-card:hover {
+  border-color: var(--cc-border-strong);
+}
+
+/* Accent tick in the top-left corner of every card. */
+.settings-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 22px;
+  height: 2px;
+  background: var(--cc-accent-bright);
+  box-shadow: 0 0 10px rgba(var(--cc-accent-bright-rgb), 0.5);
+}
+
+.settings-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--cc-border);
+}
+
+.settings-card-index {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--cc-accent-bright);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cc-text-2);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.settings-card-note {
+  margin-left: auto;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.68rem;
+  color: var(--cc-text-4);
+  text-align: right;
+  min-width: 0;
+}
+
+/* ── Settings section (label + control row) ──────────────────── */
+.settings-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  gap: 18px;
+}
+
+/* Hairline between stacked rows inside a card, so the card needs no
+   explicit divider elements. */
+.settings-section + .settings-section {
+  border-top: 1px solid rgba(var(--cc-tint-rgb), 0.05);
+}
+
+.settings-section-label {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--cc-text-2);
+  user-select: none;
+  letter-spacing: 0;
+}
+
+/* ── Label group (label + sublabel stacked) ──────────────────── */
+.settings-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-section-sublabel {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--cc-text-4);
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+/* ── Segmented control (toggle buttons) ──────────────────────── */
+.settings-segmented {
+  display: flex;
+  gap: 0;
+  background: var(--cc-overlay);
+  border-radius: 2px;
+  padding: 3px;
+  border: 1px solid var(--cc-border);
+  flex-shrink: 0;
+}
+
+.settings-seg-btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  padding: 7px 15px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--cc-text-4);
+  background: transparent;
+  transition:
+    color 0.2s ease,
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+  user-select: none;
+}
+
+.settings-seg-btn:hover:not(.active) {
+  color: var(--cc-text-3);
+  background: rgba(var(--cc-tint-rgb), 0.03);
+}
+
+.settings-seg-btn.active {
+  /* on-accent, not white: the light accents (amber, mint,
+     sky) need dark text to stay readable. */
+  color: var(--cc-on-accent);
+  background: var(--cc-accent-bright);
+  /* Cut corner, the same shape language as the auth pages' submit
+     button and the goal alert. */
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 7px),
+    calc(100% - 7px) 100%,
+    0 100%
+  );
+  box-shadow:
+    0 2px 10px rgba(var(--cc-accent-bright-rgb), 0.35),
+    0 0 20px rgba(var(--cc-accent-bright-rgb), 0.1);
+}
+
+.settings-seg-btn:active {
+  transform: scale(0.96);
+}
+
+/* Between the code languages and English: a different kind of
+   choice — exclusive, and a warm-up the server does not count. */
+.settings-seg-divider {
+  flex-shrink: 0;
+  width: 1px;
+  margin: 6px 4px;
+  background: var(--cc-border-strong);
+}
+
+/* Stands in for the Topic and Symbols rows while English is picked,
+   carrying the hairline those rows would have had. */
+.settings-warmup-note {
+  margin: 0;
+  padding: 13px 0;
+  border-top: 1px solid rgba(var(--cc-tint-rgb), 0.05);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--cc-text-3);
+}
+
+.settings-warmup-note + .settings-section {
+  border-top: 1px solid rgba(var(--cc-tint-rgb), 0.05);
+}
+
+/* ── Theme picker ────────────────────────────────────────────── */
+.settings-theme-group + .settings-theme-group {
+  margin-top: 14px;
+}
+
+.settings-theme-group-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-text-4);
+  user-select: none;
+}
+
+/* Stacked variant: the swatch row needs the full modal width. */
+.settings-section-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.settings-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.settings-theme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 6px 8px;
+  background: transparent;
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.settings-theme-swatch:hover {
+  border-color: var(--cc-border-strong);
+  background: rgba(var(--cc-tint-rgb), 0.03);
+}
+
+.settings-theme-swatch.active {
+  border-color: var(--cc-accent);
+  background: rgba(var(--cc-accent-rgb), 0.08);
+}
+
+.settings-theme-swatch:active {
+  transform: scale(0.96);
+}
+
+.settings-theme-swatch:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+/* Miniature of the palette: page colour, accent dot, text bar. */
+.settings-theme-chip {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  width: 100%;
+  height: 34px;
+  padding: 6px;
+  border: 1px solid;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.settings-theme-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.settings-theme-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  opacity: 0.75;
+}
+
+.settings-theme-name {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cc-text-4);
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.settings-theme-swatch.active .settings-theme-name {
+  color: var(--cc-accent);
+}
+
+/* ── Font picker ─────────────────────────────────────────────── */
+.settings-font-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.settings-font-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 6px 7px;
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.settings-font-btn:hover {
+  border-color: var(--cc-border-strong);
+  background: rgba(var(--cc-tint-rgb), 0.04);
+}
+
+.settings-font-btn.active {
+  border-color: var(--cc-accent);
+  background: rgba(var(--cc-accent-rgb), 0.10);
+}
+
+.settings-font-btn:active {
+  transform: scale(0.96);
+}
+
+.settings-font-btn:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+/* The sample carries the typeface; the label stays in the UI font so
+   the names remain comparable at a glance. */
+.settings-font-sample {
+  font-size: 1.15rem;
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--cc-text);
+  white-space: nowrap;
+}
+
+.settings-font-btn.active .settings-font-sample {
+  color: var(--cc-accent);
+}
+
+.settings-font-name {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cc-text-4);
+  white-space: nowrap;
+}
+
+.settings-font-btn.active .settings-font-name {
+  color: var(--cc-accent);
+}
+
+/* ── Divider between sections ────────────────────────────────── */
+.settings-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cc-border), transparent);
+  margin: 8px 0;
+}
+
+/* ── Modal footer (status bar) ───────────────────────────────── */
+.settings-modal-footer {
+  padding: 12px 26px;
+  border-top: 1px solid var(--cc-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(
+    0deg,
+    rgba(var(--cc-tint-rgb), 0.035),
+    transparent
+  );
+}
+
+.settings-foot-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-text-4);
+  flex-shrink: 0;
+}
+
+.settings-snippet-chip {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--cc-text-2);
+  letter-spacing: 0;
+  padding: 4px 12px;
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 2px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-foot-hint {
+  margin-left: auto;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.66rem;
+  color: var(--cc-text-4);
+  flex-shrink: 0;
+}
+
+.settings-foot-hint kbd {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  margin-right: 4px;
+  color: var(--cc-text-3);
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 2px;
+}
+
+/* ── Practice progress block (card 02) ───────────────────────── */
+.settings-practice {
+  margin-top: 12px;
+  padding: 11px 12px;
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 2px;
+}
+
+.settings-practice-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.settings-practice-caption {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-text-4);
+}
+
+/* ── Toggle switch (reused from old settings) ────────────────── */
+.settings-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.settings-toggle input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.settings-toggle-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--cc-border-strong);
+  border-radius: 11px;
+  transition:
+    background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease;
+}
+
+.settings-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--cc-text-3);
+  border-radius: 50%;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s ease;
+}
+
+/* Active (checked) state */
+.settings-toggle input:checked ~ .settings-toggle-track {
+  background: var(--cc-accent);
+  box-shadow: 0 0 12px rgba(var(--cc-accent-rgb), 0.25);
+}
+
+.settings-toggle input:checked ~ .settings-toggle-track .settings-toggle-thumb {
+  transform: translateX(18px);
+  background: var(--cc-on-accent);
+}
+
+/* Focus ring for accessibility */
+.settings-toggle input:focus-visible ~ .settings-toggle-track {
+  outline: 2px solid var(--cc-accent-bright);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THICK CARET — F1 Red (toggled via .caret-thick)
+   ═══════════════════════════════════════════════════════════════ */
+.caret-thick {
+  width: 3.5px !important;
+  background: var(--cc-accent-bright) !important;
+  border-radius: 1.5px !important;
+  filter:
+    drop-shadow(0 0 4px rgba(var(--cc-accent-bright-rgb), 0.95))
+    drop-shadow(0 0 10px rgba(var(--cc-accent-bright-rgb), 0.55))
+    drop-shadow(0 0 20px rgba(var(--cc-accent-bright-rgb), 0.25)) !important;
+  animation: caret-thick-blink 1s step-end infinite;
+}
+
+@keyframes caret-thick-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARET ONLY MODE — strip active-char background highlight
+   Specificity must beat .light-typing-sandbox .rt-char-active
+   ═══════════════════════════════════════════════════════════════ */
+.light-typing-sandbox .hide-active-highlight .rt-char-active {
+  background-color: transparent !important;
+  text-shadow: none !important;
+  font-weight: normal !important;
+  color: var(--cc-text-2) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   F1 STEERING WHEEL DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
+.f1-dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 11px 40px;
+  flex-shrink: 0;
+  /* No rule here: the bg-2 -> bg gradient already separates the header
+     from the page on both light and dark palettes. */
+  border-bottom: none;
+  /* Was a hardcoded near-black top stop, which painted a dark band
+     across the header on light palettes. bg-2 is the theme's own
+     'slightly off background', so this reads as a subtle lift either way. */
+  background: linear-gradient(180deg, var(--cc-bg-2) 0%, var(--cc-bg) 100%);
+}
+
+.f1-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* `surface` rather than `bg-2`: bg-2 is only a hair off the page
+     colour, so on light palettes these read as cards, not as invisible
+     patches. The hairline gives them an edge on every palette. */
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
+  padding: 7px 20px;
+  min-width: 104px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.f1-module::before {
+  display: none;
+}
+
+.f1-module-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--cc-text);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", "Courier New", monospace);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-shadow: 0 0 8px rgba(var(--cc-tint-rgb), 0.1);
+}
+
+.f1-module-value.f1-red {
+  color: var(--cc-accent);
+  text-shadow: 0 0 20px rgba(var(--cc-accent-rgb), 0.4);
+}
+
+.f1-module-value.f1-green {
+  color: var(--cc-success);
+  text-shadow: 0 0 15px rgba(0, 210, 106, 0.3);
+}
+
+.f1-module-value.f1-yellow {
+  color: var(--cc-warning);
+  text-shadow: 0 0 15px rgba(255, 208, 0, 0.3);
+}
+
+.f1-module-label {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--cc-text-3);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-family: var(--font-display);
+  margin-top: 4px;
+}
+
+.f1-module-divider {
+  display: none;
+}
+
+/* Speed bar inside WPM module */
+.f1-speed-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--cc-overlay);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 4px;
+}
+
+.f1-speed-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cc-accent), var(--cc-error));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 6px rgba(var(--cc-accent-rgb), 0.5);
+}
+
+
+
+
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LIVE TRACK PROGRESS BAR
+   ═══════════════════════════════════════════════════════════════ */
+.f1-track-container {
+  padding: 8px 40px;
+  flex-shrink: 0;
+  border-bottom: none;
+  background: var(--cc-bg-2);
+}
+
+.f1-track {
+  position: relative;
+  height: 32px;
+  border-radius: 4px;
+  overflow: visible;
+  display: flex;
+}
+
+/* Sector zone backgrounds */
+.f1-track-sector {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.f1-track-sector:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.f1-track-sector:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.f1-track-sector.s1 {
+  background: linear-gradient(90deg, rgba(var(--cc-accent-rgb), 0.12), rgba(var(--cc-accent-rgb), 0.06));
+}
+.f1-track-sector.s2 {
+  background: linear-gradient(90deg, rgba(0, 100, 255, 0.10), rgba(0, 100, 255, 0.05));
+  border-left: 1px solid var(--cc-border);
+  border-right: 1px solid var(--cc-border);
+}
+.f1-track-sector.s3 {
+  background: linear-gradient(90deg, rgba(255, 208, 0, 0.10), rgba(255, 208, 0, 0.05));
+}
+
+.f1-track-sector-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-border-strong);
+  pointer-events: none;
+}
+
+/* The racing line (completed portion) */
+.f1-track-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cc-accent), var(--cc-error));
+  border-radius: 4px 0 0 4px;
+  transition: width 0.15s ease-out;
+  box-shadow: 0 0 8px rgba(var(--cc-accent-rgb), 0.3);
+  z-index: 1;
+}
+
+/* F1 car icon */
+.f1-car {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.3rem;
+  z-index: 3;
+  transition: left 0.15s ease-out;
+  filter: drop-shadow(0 0 6px rgba(var(--cc-tint-rgb), 0.3));
+}
+
+/* Finish flag */
+.f1-flag {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  z-index: 2;
+  opacity: 0.6;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RACE ENGINEER RADIO TOASTS
+   ═══════════════════════════════════════════════════════════════ */
+.f1-radio-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 340px;
+}
+
+.f1-radio-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  /* Themed surface, not a hardcoded near-black: this toast is the
+     one panel that stayed dark on every palette. */
+  background: rgba(var(--cc-surface-rgb), 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--cc-accent-rgb), 0.25);
+  border-left: 3px solid var(--cc-accent);
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(var(--cc-shadow-rgb), calc(0.5 * var(--cc-shadow-strength))), 0 0 20px rgba(var(--cc-accent-rgb), 0.1);
+  pointer-events: auto;
+  cursor: pointer;
+  animation: f1-radio-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.f1-radio-toast:hover {
+  border-color: rgba(var(--cc-accent-rgb), 0.5);
+  transform: translateX(-4px);
+}
+
+.f1-radio-toast.exiting {
+  animation: f1-radio-slide-out 0.3s ease forwards;
+}
+
+.f1-radio-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.f1-radio-content {
+  flex: 1;
+}
+
+.f1-radio-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--cc-accent);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  margin-bottom: 1px;
+}
+
+.f1-radio-text {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--cc-text-2);
+  line-height: 1.3;
+}
+
+.f1-radio-static {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.f1-radio-static-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 12px;
+}
+
+.f1-radio-static-bar {
+  width: 2px;
+  background: var(--cc-accent);
+  border-radius: 1px;
+  animation: radio-bar-bounce 0.6s ease-in-out infinite;
+}
+
+.f1-radio-static-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.f1-radio-static-bar:nth-child(2) { height: 8px; animation-delay: 0.1s; }
+.f1-radio-static-bar:nth-child(3) { height: 6px; animation-delay: 0.2s; }
+.f1-radio-static-bar:nth-child(4) { height: 10px; animation-delay: 0.15s; }
+
+@keyframes radio-bar-bounce {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes f1-radio-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes f1-radio-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
+  }
+}
+
+
+/* ── Code area wrapper ───────────────────────────────────────── */
+.lts-code-area {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
+  margin-top: -20px;
+}
+
+/* Force the component wrapper to fill and center */
+.light-typing-sandbox .lts-code-area > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Force the RaceTrack root to fill width.
+   :first-child, because RaceTrack is the first thing in the code frame
+   and the only thing this was ever for. Without it the rule matched
+   every child — including the start hint and track bar, which
+   are absolutely positioned and must shrink to their content: forced
+   to 100% they spanned the whole page and their content sat against
+   the left edge instead of over the code. */
+.light-typing-sandbox .lts-code-area > div > div:first-child {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* ── Hide horizontal scrollbar (code display) ────────────────── */
+/* Target the .code-display container and all scrollable children */
+.light-typing-sandbox .code-display,
+.light-typing-sandbox .code-display pre,
+.light-typing-sandbox .code-display code,
+.light-typing-sandbox .code-display .rt-code-layer {
+  scrollbar-width: none !important;          /* Firefox */
+  -ms-overflow-style: none !important;       /* Edge / IE */
+}
+
+.light-typing-sandbox .code-display::-webkit-scrollbar,
+.light-typing-sandbox .code-display pre::-webkit-scrollbar,
+.light-typing-sandbox .code-display code::-webkit-scrollbar,
+.light-typing-sandbox .code-display .rt-code-layer::-webkit-scrollbar {
+  display: none !important;                  /* Chrome / Safari / Edge */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ── Keyboard area ───────────────────────────────────────────── */
+.lts-keyboard-area {
+  flex-shrink: 0;
+  padding: 16px 40px 28px;
+  display: flex;
+  justify-content: center;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+  transform: scale(1.12) translateY(-25px);
+  transform-origin: top center;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FOCUS OVERLAY — Monkeytype-style blur + click-to-focus
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Blur content when window loses focus */
+.typing-unfocused .code-display,
+.typing-unfocused .w-full.max-w-4xl.mx-auto {
+  filter: blur(5px);
+  opacity: 0.3;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.typing-unfocused.lts-keyboard-area {
+  filter: blur(4px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* The overlay itself */
+.focus-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc-text-3);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.01em;
+  border-radius: 12px;
+  transition: background-color 0.15s ease;
+}
+
+.focus-overlay:hover {
+  background-color: rgba(var(--cc-tint-rgb), 0.03);
+}
+
+.focus-overlay svg {
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RACETRACK OVERRIDES — F1 Racing Line Typography
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Code display container — strip chrome + sliding window ── */
+.light-typing-sandbox .code-display {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  --editor-pad: 0px;
+
+  /* Strict 3-line mask: 2rem * 1.8 * 3 ≈ 10.8rem */
+  height: 10.8rem !important;
+  max-height: 10.8rem !important;
+  overflow: hidden !important;
+  position: relative !important;
+
+  display: block !important;
+  width: fit-content !important;
+  max-width: min(80vw, 1600px) !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 40px !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+
+}
+
+/* 1. Kill hidden inputs/textareas stretching the box */
+.light-typing-sandbox .code-display input,
+.light-typing-sandbox .code-display textarea {
+  position: absolute !important;
+  width: 1px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+}
+
+/* 2. Force internal layers to fill the container width */
+.light-typing-sandbox .code-display > * {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* ── Pin internal layers flush inside the centered container ─── */
+.light-typing-sandbox .code-display .rt-code-layer {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+/* ── Wrapping rules — ensure massive text folds at container edge ── */
+.light-typing-sandbox .code-display,
+.light-typing-sandbox .rt-code-layer {
+  /* Preserve spaces but allow the line to wrap at the container edge */
+  white-space: pre-wrap !important;
+
+  /* Break strictly at the edge of the container if necessary */
+  overflow-wrap: break-word !important;
+
+  /* Keep individual words together whenever possible */
+  word-break: normal !important;
+
+  /* Ensure the container spans the full width but doesn't hide overflow */
+  overflow-x: visible !important;
+}
+
+/* ── Phones: the field that brings the keyboard up ──────────────
+   Laid over the code, invisible, so a tap anywhere on the code
+   focuses it. 16px so iOS does not zoom the page on focus. */
+.race-touch-input {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  resize: none;
+  overflow: hidden;
+  opacity: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Force massive font on ALL text layers + their children ──── */
+/* Size and leading come from custom properties the sandbox sets from
+   the user's settings; the literals here are the defaults, so the
+   look is unchanged for anyone who never touches them. Still
+   !important because these have to beat the Tailwind utilities on the
+   layers themselves. */
+.light-typing-sandbox .code-display,
+.light-typing-sandbox .code-display .rt-code-layer,
+.light-typing-sandbox .code-display .rt-code-layer span,
+.light-typing-sandbox .code-display pre[class*="language-"] {
+  font-size: var(--race-font-size, 2rem) !important;
+  line-height: var(--race-line-height, 1.8) !important;
+  letter-spacing: 1px !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   START HINT & TRACK BAR
+   The two pieces of chrome that hang off the code block: the start
+   hint above it before a race, the track bar below it between
+   races. Both are absolutely positioned against .lts-code-frame, so
+   neither takes layout space — showing or hiding them can never
+   move the code under your eyes.
+
+   This replaced a full-size overlay centred ON the code, which
+   blurred the snippet to 6px at 30% opacity. You could not read
+   what you were about to type until you had already started.
+   ═══════════════════════════════════════════════════════════════ */
+
+.lts-code-frame {
+  position: relative;
+}
+
+/* ── Start hint ───────────────────────────────────────────────── */
+.start-hint {
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.86rem;
+  color: var(--cc-text-3);
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.start-hint.is-gone {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* ── Track bar ────────────────────────────────────────────────── */
+.track-bar {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  white-space: nowrap;
+  z-index: 5;
+  transition: opacity 0.25s ease;
+}
+
+.track-bar-config {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Between races only — the whole bar, restart hint included, so
+   nothing sits under the code while you type. Faded rather than
+   removed, so nothing reflows, and made inert so a stray click
+   mid-lap cannot redraw the track. Tab + Enter itself keeps working;
+   only its label leaves. */
+.track-bar.is-racing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.track-bar-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: 6px;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.8rem;
+  color: var(--cc-text-3);
+}
+
+.track-bar-summary i {
+  font-style: normal;
+  color: var(--cc-text-4);
+}
+
+.track-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  border: 1px solid var(--cc-border);
+  background: transparent;
+  color: var(--cc-text-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  font-family: var(--font-display);
+}
+
+.track-bar-btn:hover:not(:disabled) {
+  color: var(--cc-text);
+  background: var(--cc-elevated);
+  border-color: var(--cc-border-strong);
+}
+
+/* A linked track — a challenge or the track of the day — stands in for
+   the setup summary, with the one control that leaves it. */
+.track-bar-special {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--cc-accent-rgb), 0.45);
+  background: rgba(var(--cc-accent-rgb), 0.08);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cc-text-2);
+  white-space: nowrap;
+}
+
+.track-bar-special-kind {
+  color: light-dark(color-mix(in srgb, var(--cc-accent) 80%, #000), var(--cc-accent));
+  font-weight: 700;
+}
+
+.track-bar-special-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cc-text-3);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.track-bar-special-close:hover {
+  color: var(--cc-text);
+  background: var(--cc-elevated);
+}
+
+.track-bar-special-close:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 1px;
+}
+
+.track-bar-btn:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+.track-bar-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.track-bar-hint {
+  font-size: 0.76rem;
+  color: var(--cc-text-3);
+}
+
+.track-bar-hint kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  border: 1px solid var(--cc-border-strong);
+  border-bottom-width: 2px;
+  background: var(--cc-elevated);
+  color: var(--cc-text-3);
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+/* Short windows: tighter gaps. The code is centred in whatever height
+   is left between the dashboard and the keyboard, so on a 1366x657
+   laptop the room above and below it is a few dozen pixels. */
+@media (max-height: 720px) {
+  .start-hint {
+    bottom: calc(100% + 12px);
+  }
+  .track-bar {
+    top: calc(100% + 12px);
+  }
+}
+
+/* Below these there is no gap to put them in. The code block is a
+   fixed 173px at every snippet length (RaceTrack scrolls inside it),
+   so viewport height alone decides the room; these are where the
+   measured clearance drops under ~10px. The hint goes first — the
+   caret on the first character already says where to start, and the
+   track bar still says what is loaded. */
+@media (max-height: 625px) {
+  .start-hint,
+  .track-bar {
+    display: none;
+  }
+}
+
+/* Narrow windows: the summary is the first thing to go, since the
+   buttons still name what they do. */
+@media (max-width: 760px) {
+  .track-bar-summary,
+  .track-bar-hint {
+    display: none;
+  }
+  .start-hint {
+    white-space: normal;
+    width: max-content;
+    max-width: 90vw;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .start-hint,
+  .track-bar {
+    transition: none;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RACING LINE — F1 Character Styling
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Upcoming (Untyped): Dark faded grey ─────────────────────── */
+.light-typing-sandbox .rt-char-pending {
+  /* --cc-untyped, not --cc-text-4: muted *labels* need >=3:1 while
+     untyped characters must stay recessive. One token cannot serve
+     both, and sharing it made upcoming text too prominent. */
+  color: var(--cc-untyped) !important;
+  transition: color 0.05s ease;
+}
+
+/* ── Correct: Bright white — the "racing line" ───────────────── */
+.light-typing-sandbox .rt-char-correct {
+  color: var(--cc-text) !important;
+  text-shadow: 0 0 1px rgba(var(--cc-tint-rgb), 0.3);
+  transition: color 0.05s ease;
+}
+
+/* ── Current (Active Caret): F1 Red with glowing aura ────────── */
+.light-typing-sandbox .rt-char-active {
+  color: var(--cc-accent-bright) !important;
+  background-color: rgba(var(--cc-accent-bright-rgb), 0.2) !important;
+  font-weight: bold !important;
+  border-radius: 2px;
+  text-shadow: 0 0 10px rgba(var(--cc-accent-bright-rgb), 0.8) !important;
+}
+
+/* ── Mistake (Incorrect): Aggressive red flash penalty ───────── */
+.light-typing-sandbox .rt-char-incorrect {
+  color: var(--cc-text) !important;
+  background-color: rgba(var(--cc-error-rgb), 0.7) !important;
+  border-radius: 2px;
+  animation: f1-penalty-flash 0.3s ease-in-out 3;
+}
+
+@keyframes f1-penalty-flash {
+  0% {
+    background-color: rgba(var(--cc-error-rgb), 0.9);
+    box-shadow: 0 0 12px rgba(var(--cc-error-rgb), 0.8), inset 0 0 8px rgba(var(--cc-error-rgb), 0.6);
+    transform: scale(1.1);
+  }
+  50% {
+    background-color: rgba(255, 50, 50, 1);
+    box-shadow: 0 0 24px rgba(var(--cc-error-rgb), 1), inset 0 0 15px rgba(255, 100, 100, 0.8);
+    transform: scale(1.15);
+  }
+  100% {
+    background-color: rgba(var(--cc-error-rgb), 0.7);
+    box-shadow: 0 0 6px rgba(var(--cc-error-rgb), 0.4);
+    transform: scale(1);
+  }
+}
+
+
+/* ── Caret — F1 Red racing cursor ────────────────────────────── */
+.light-typing-sandbox .caret {
+  background: var(--cc-accent) !important;
+  filter: none !important;
+  box-shadow: 0 0 12px rgba(var(--cc-accent-rgb), 0.6), 0 0 24px rgba(var(--cc-accent-rgb), 0.3);
+  animation: f1-caret-glow 1s ease-in-out infinite !important;
+}
+
+@keyframes f1-caret-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(var(--cc-accent-rgb), 0.6), 0 0 24px rgba(var(--cc-accent-rgb), 0.3);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 6px rgba(var(--cc-accent-rgb), 0.3), 0 0 12px rgba(var(--cc-accent-rgb), 0.15);
+  }
+}
+
+
+/* ── Prism syntax layer — fully hidden to prevent ghost text ─── */
+.light-typing-sandbox .code-display pre[class*="language-"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ── Constrain RaceTrack root — fill available width ─────────── */
+.light-typing-sandbox .w-full.max-w-4xl.mx-auto {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   🏁 CHEQUERED FLAG RESULTS SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Full-screen overlay ─────────────────────────────────────── */
+.f1-chequered-flag-screen {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  /* No bottom padding: the sticky action bar measures "bottom: 0"
+     from inside this padding, so 80px here left it floating 80px up.
+     The space moved under the last line instead (.cf-config-note). */
+  padding: 50px 20px 0 20px !important;
+  z-index: 9999 !important;
+  background-color: var(--cc-bg-2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  animation: cf-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cf-fade-in {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Animated checkered stripe ───────────────────────────────── */
+.cf-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ffffff 0px,
+    #ffffff 12px,
+    #000000 12px,
+    #000000 24px
+  );
+  opacity: 0.7;
+  animation: cf-stripe-scroll 8s linear infinite;
+}
+
+@keyframes cf-stripe-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 240px 0; }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.cf-header {
+  text-align: center;
+  margin-bottom: 0;
+  animation: cf-title-arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+@keyframes cf-title-arrive {
+  0% { opacity: 0; transform: scale(0.9) translateY(16px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cf-title {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--cc-text);
+  letter-spacing: -0.01em;
+  margin: 0 0 8px 0;
+  text-shadow: 0 0 40px rgba(var(--cc-tint-rgb), 0.15), 0 0 80px rgba(var(--cc-tint-rgb), 0.05);
+  line-height: 1.05;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PERSONAL BEST BANNER
+   Shown on the results screen when the lap beat your stored record
+   for that snippet. Gold rather than the accent red: red is the
+   app's everyday colour and would read as just another label, while
+   gold is used nowhere else and so reads as an award.
+   ═══════════════════════════════════════════════════════════════ */
+/* ── Lap not recorded ───────────────────────────────────────────
+   Deliberately quiet next to the celebration banners above it: no
+   gradient, no glow, no animation. This is a correction to what the
+   rest of the screen implies, and dressing it up like an award
+   would read as one at a glance. Monospace, because it speaks in
+   the same telemetry voice as the stat labels. */
+.cf-submit-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+
+  width: fit-content;
+  max-width: min(44ch, 90%);
+  margin: 10px auto 4px;
+  padding: 9px 16px;
+
+  border: 1px solid rgba(248, 113, 113, 0.32);
+  border-left: 3px solid #f87171;
+  background: rgba(248, 113, 113, 0.07);
+  border-radius: 6px;
+
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  text-align: center;
+
+  /* Same stacking context as the banners, so it cannot slide under
+     the car image below it. */
+  position: relative;
+  z-index: 1;
+}
+
+.cf-submit-error strong {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #f87171;
+}
+
+.cf-submit-error span {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  /* The server's own wording, which can run long — it is the only
+     thing on screen that says what to do about this. */
+  color: var(--color-text-secondary);
+}
+
+/* ── Where you stand on this track ──────────────────────────────
+   A single row under the banners: your position on the track's board
+   and the way into its podium. Tinted by medal on P1–P3, neutral off
+   the podium, and quieter still when it is only telling you how to
+   get on (sign in, or finish the lap). The medal tones are the same
+   per-scheme pair the leaderboard uses, so the colours match. */
+.cf-standing {
+  --standing-tone: var(--cc-text-3);
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: min(600px, 92%);
+  margin: 12px auto 4px;
+  padding: 7px 8px 7px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--standing-tone) 35%, transparent);
+  background: color-mix(in srgb, var(--standing-tone) 7%, transparent);
+  font-size: 0.86rem;
+  color: var(--cc-text-2);
+
+  /* Same stacking context as the banners, so it cannot slide under
+     the car image below it. */
+  position: relative;
+  z-index: 1;
+}
+
+.cf-standing.is-p1 { --standing-tone: light-dark(#9a7400, #ffd700); }
+.cf-standing.is-p2 { --standing-tone: light-dark(#5f6875, #c0c0c0); }
+.cf-standing.is-p3 { --standing-tone: light-dark(#9a5a1c, #cd7f32); }
+
+.cf-standing.is-muted {
+  --standing-tone: var(--cc-border-strong);
+  color: var(--cc-text-3);
+}
+
+.cf-standing-icon {
+  flex-shrink: 0;
+  color: var(--standing-tone);
+}
+
+.cf-standing.is-muted .cf-standing-icon {
+  color: var(--cc-text-4);
+}
+
+.cf-standing-text {
+  min-width: 0;
+}
+
+.cf-standing-text strong {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-weight: 800;
+  color: var(--standing-tone);
+}
+
+/* Off the podium the position is plain text — no medal to wear. */
+.cf-standing:not(.is-p1):not(.is-p2):not(.is-p3) .cf-standing-text strong {
+  color: var(--cc-text);
+}
+
+.cf-standing-gap {
+  color: var(--cc-text-3);
+}
+
+.cf-standing-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cc-border-strong);
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-family: var(--font-display);
+}
+
+.cf-standing-btn:hover {
+  background: var(--cc-elevated);
+}
+
+.cf-standing-btn:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .cf-standing {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 8px 12px;
+    text-align: center;
+  }
+}
+
+.pb-banner-wrap {
+  text-align: center;
+  margin: 10px 0 4px;
+  /* Own stacking context so the glow cannot bleed over the car. */
+  position: relative;
+  z-index: 1;
+}
+
+.pb-banner {
+  /* Matches .cf-title's vocabulary — same face, same weight — then
+     leans it over. The italic is the only
+     slanted type on the screen, which is what makes it read as
+     motion rather than as another heading. */
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.4vw, 2.1rem);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin: 0;
+
+  /* Gold gradient through the glyphs. `color` stays a real value as
+     the fallback: where -webkit-text-fill-color is unsupported the
+     text renders solid gold instead of invisible. */
+  background: linear-gradient(
+    180deg,
+    light-dark(#b45309, #fffbeb) 0%,
+    light-dark(#a16207, #fde68a) 30%,
+    light-dark(#92400e, #facc15) 58%,
+    light-dark(#78350f, #d97706) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: light-dark(#a16207, #facc15);
+  -webkit-text-fill-color: transparent;
+
+  /* drop-shadow, not text-shadow: a text-shadow would be painted
+     behind a transparent fill and vanish. This traces the glyphs. */
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5));
+
+  /* The resting state IS the finished state, so neither animation
+     needs `forwards` to hold it — an animation-fill-mode of `both`
+     here would pin the element to the `from` keyframe and render it
+     at scale(0.72) for anything measuring it before playback. */
+  opacity: 1;
+  transform: scale(1);
+  animation:
+    pb-arrive 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+    pb-glow 2.8s ease-in-out 0.55s infinite;
+}
+
+/* Fast scale-in that overshoots past 1 before settling — the
+   cubic-bezier's >1 control point is what produces the snap. */
+@keyframes pb-arrive {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+    filter: drop-shadow(0 0 0 rgba(250, 204, 21, 0));
+  }
+  60% {
+    opacity: 1;
+    filter: drop-shadow(0 0 22px rgba(250, 204, 21, 0.75));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5));
+  }
+}
+
+/* Slow breathing glow. Deliberately shallow — this sits above the
+   numbers people are actually reading, and anything stronger turns
+   from "award" into "distraction" within a couple of cycles. */
+@keyframes pb-glow {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5));
+  }
+  50% {
+    transform: scale(1.022);
+    filter: drop-shadow(0 0 18px rgba(250, 204, 21, 0.7));
+  }
+}
+
+.pb-delta {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cc-text-2, rgba(255, 255, 255, 0.6));
+  margin-top: 6px;
+  animation: pb-delta-arrive 0.4s ease-out 0.3s backwards;
+}
+
+.pb-delta strong {
+  color: light-dark(#92400e, #facc15);
+  font-weight: 900;
+}
+
+@keyframes pb-delta-arrive {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* A pulsing, scaling award is exactly the kind of motion that causes
+   trouble for vestibular disorders. Keep the gold, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  .pb-banner,
+  .pb-delta {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .pb-banner { letter-spacing: 0.01em; }
+  .pb-delta { font-size: 0.68rem; letter-spacing: 0.16em; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRACK RECORD BANNER
+   The fastest lap any account has posted on this snippet.
+
+   Purple, following F1's own timing convention: purple is the
+   session-best time set by anyone, green is a driver's personal
+   best. Gold already means "your record" here, so purple keeps the
+   two readable at a glance rather than competing as louder and
+   louder versions of the same idea.
+
+   Bigger and slower than the personal-best banner because it is
+   rarer — it should feel like a different category of event, not a
+   brighter one.
+   ═══════════════════════════════════════════════════════════════ */
+.tr-banner-wrap {
+  text-align: center;
+  margin: 12px 0 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.tr-banner {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4.2vw, 2.6rem);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.08;
+  margin: 0;
+
+  background: linear-gradient(
+    180deg,
+    #f5f3ff 0%,
+    #d8b4fe 28%,
+    #a855f7 60%,
+    #6d28d9 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #c084fc;
+  -webkit-text-fill-color: transparent;
+
+  filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.55));
+
+  /* Resting state is the finished state, so no fill-mode is needed
+     to hold it — see the note on .pb-banner. */
+  opacity: 1;
+  transform: scale(1);
+  animation:
+    tr-arrive 0.7s cubic-bezier(0.34, 1.62, 0.58, 1),
+    tr-glow 3.4s ease-in-out 0.7s infinite;
+}
+
+/* Lands harder than the PB banner: starts smaller, overshoots
+   further, and takes slightly longer to settle. */
+@keyframes tr-arrive {
+  0% {
+    opacity: 0;
+    transform: scale(0.58) rotate(-2deg);
+    filter: drop-shadow(0 0 0 rgba(168, 85, 247, 0));
+  }
+  55% {
+    opacity: 1;
+    filter: drop-shadow(0 0 34px rgba(168, 85, 247, 0.9));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.55));
+  }
+}
+
+@keyframes tr-glow {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.55));
+  }
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 26px rgba(168, 85, 247, 0.8));
+  }
+}
+
+.tr-delta {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cc-text-2, rgba(255, 255, 255, 0.6));
+  margin-top: 8px;
+  animation: pb-delta-arrive 0.4s ease-out 0.45s backwards;
+}
+
+.tr-delta strong {
+  color: #c084fc;
+  font-weight: 900;
+}
+
+/* ── Dashboard module ────────────────────────────────────────
+   The live "bar to beat" readout, sitting alongside WPM and
+   accuracy during a race. */
+.f1-purple {
+  color: #c084fc !important;
+  text-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+}
+
+/* A button — it opens the track's podium — dressed as a module.
+   Buttons do not inherit type or colour, so both are restored, and
+   the hover says "this one does something" without breaking the
+   strip's rhythm. */
+button.f1-module-record {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button.f1-module-record:hover {
+  border-color: rgba(168, 85, 247, 0.55);
+  background: rgba(168, 85, 247, 0.06);
+}
+
+button.f1-module-record:focus-visible {
+  outline: 2px solid #c084fc;
+  outline-offset: 2px;
+}
+
+.f1-module-record .f1-module-label {
+  /* Holder names are user-supplied and up to 24 characters, which is
+     wider than any other label on the dashboard. Truncate rather than
+     let one long name reflow the whole telemetry strip. */
+  max-width: 17ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tr-banner,
+  .tr-delta {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .tr-banner { letter-spacing: 0.01em; }
+  .tr-delta { font-size: 0.68rem; letter-spacing: 0.14em; }
+}
+
+.cf-subtitle {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cc-accent);
+  letter-spacing: 0.5em;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(var(--cc-accent-rgb), 0.3);
+}
+
+/* ── Hero display wrapper ────────────────────────────────────── */
+.hero-display-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  animation: cf-hero-arrive 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+/* ── Hero car image ─────────────────────────────────────────── */
+.results-hero-car {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  margin: -80px auto -60px;
+  mix-blend-mode: lighten;
+  filter: drop-shadow(0 8px 30px rgba(var(--cc-accent-rgb), 0.15));
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Waving checkered flag ───────────────────────────────────── */
+.waving-flag {
+  position: absolute;
+  right: 2%;
+  top: 18%;
+  font-size: 4rem;
+  line-height: 1;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  animation: flag-wave-3d 1.25s ease-in-out 4 forwards;
+  filter: drop-shadow(0 4px 12px rgba(var(--cc-shadow-rgb), calc(0.4 * var(--cc-shadow-strength))));
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+}
+
+@keyframes flag-wave-3d {
+  0% {
+    transform: perspective(400px) rotateY(0deg) rotateZ(-5deg) skewY(0deg) scaleX(1);
+  }
+  12% {
+    transform: perspective(400px) rotateY(-25deg) rotateZ(8deg) skewY(-3deg) scaleX(0.92);
+  }
+  28% {
+    transform: perspective(400px) rotateY(20deg) rotateZ(-10deg) skewY(4deg) scaleX(1.06);
+  }
+  44% {
+    transform: perspective(400px) rotateY(-18deg) rotateZ(12deg) skewY(-5deg) scaleX(0.94);
+  }
+  60% {
+    transform: perspective(400px) rotateY(15deg) rotateZ(-8deg) skewY(3deg) scaleX(1.04);
+  }
+  76% {
+    transform: perspective(400px) rotateY(-10deg) rotateZ(6deg) skewY(-2deg) scaleX(0.97);
+  }
+  90% {
+    transform: perspective(400px) rotateY(5deg) rotateZ(-3deg) skewY(1deg) scaleX(1.01);
+  }
+  100% {
+    /* Resting state — gently unfurled, natural static pose */
+    transform: perspective(400px) rotateY(4deg) rotateZ(-2deg) skewY(0deg) scaleX(1);
+  }
+}
+
+@keyframes cf-hero-arrive {
+  0% { opacity: 0; transform: translateX(-40px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ── Telemetry Grid ──────────────────────────────────────────── */
+.cf-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 28px;
+  animation: cf-grid-arrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@keyframes cf-grid-arrive {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Stat box ────────────────────────────────────────────────── */
+.cf-stat-box {
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  box-shadow: inset 0 0 30px rgba(var(--cc-shadow-rgb), calc(0.5 * var(--cc-shadow-strength))), 0 2px 8px rgba(var(--cc-shadow-rgb), calc(0.3 * var(--cc-shadow-strength)));
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cf-stat-box:hover {
+  border-color: var(--cc-untyped);
+  box-shadow: inset 0 0 30px rgba(var(--cc-shadow-rgb), calc(0.5 * var(--cc-shadow-strength))), 0 0 12px rgba(var(--cc-tint-rgb), 0.03);
+}
+
+/* ── Position box (spans full top row) ───────────────────────── */
+.position-box {
+  grid-column: span 2;
+  border-color: var(--cc-accent);
+  background: linear-gradient(180deg, rgba(var(--cc-accent-rgb), 0.12) 0%, var(--cc-surface) 60%);
+  box-shadow: inset 0 0 40px rgba(var(--cc-accent-rgb), 0.08), 0 0 30px rgba(var(--cc-accent-rgb), 0.08);
+  padding: 28px 20px;
+}
+
+.position-box:hover {
+  border-color: var(--cc-error);
+  box-shadow: inset 0 0 40px rgba(var(--cc-accent-rgb), 0.12), 0 0 40px rgba(var(--cc-accent-rgb), 0.12);
+}
+
+.position-box .cf-value {
+  color: var(--cc-accent) !important;
+  font-size: 5rem !important;
+  text-shadow: 0 0 30px rgba(var(--cc-accent-rgb), 0.35);
+  line-height: 1;
+}
+
+/* ── Labels & Values ─────────────────────────────────────────── */
+.cf-label {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--cc-text-3);
+  letter-spacing: 0.01em;
+  margin-bottom: 8px;
+  text-transform: none;
+}
+
+.cf-value {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--cc-text);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8px rgba(var(--cc-tint-rgb), 0.08);
+}
+
+.cf-value small {
+  font-size: 0.45em;
+  font-weight: 600;
+  color: var(--cc-text-3);
+  margin-left: 4px;
+  letter-spacing: 0.05em;
+}
+
+.cf-value.cf-green {
+  color: var(--cc-success);
+  text-shadow: 0 0 15px rgba(0, 210, 106, 0.25);
+}
+
+/* Rating lost. Mirrors cf-green rather than reusing the accent red,
+   which is the app's everyday colour and would not read as "down". */
+.cf-value.cf-red {
+  color: var(--cc-error, #f87171);
+  text-shadow: 0 0 15px rgba(var(--cc-error-rgb, 248, 113, 113), 0.25);
+}
+
+/* The absolute figure under a delta — the new rating beneath the
+   change that produced it. Quiet, because the delta is the news. */
+.cf-sub {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--cc-text-4);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+/* ── Sector summary chips ────────────────────────────────────── */
+.cf-sector-summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  animation: cf-grid-arrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.cf-sector-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 4px;
+  font-family: var(--global-font, "JetBrains Mono", monospace);
+}
+
+.cf-sector-chip .cf-sector-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cf-sector-chip .cf-sector-time {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: light-dark(color-mix(in srgb, var(--cc-success) 80%, #000), var(--cc-success));
+  font-variant-numeric: tabular-nums;
+}
+
+/* Light themes take a darker shade of each, to stay readable on the
+   pale chips (light-dark() follows the theme's color-scheme). */
+.cf-sector-chip.s1 .cf-sector-label { color: light-dark(color-mix(in srgb, var(--cc-accent) 75%, #000), var(--cc-accent)); }
+.cf-sector-chip.s2 .cf-sector-label { color: light-dark(#1d4ed8, #3b82f6); }
+.cf-sector-chip.s3 .cf-sector-label { color: light-dark(color-mix(in srgb, var(--cc-warning) 72%, #000), var(--cc-warning)); }
+
+.cf-sector-chip.s1 { border-color: rgba(var(--cc-accent-rgb), 0.2); }
+.cf-sector-chip.s2 { border-color: rgba(59, 130, 246, 0.2); }
+.cf-sector-chip.s3 { border-color: rgba(255, 208, 0, 0.2); }
+
+/* ── Speed Telemetry Graph ────────────────────────────────────── */
+.cf-graph-container {
+  width: 100%;
+  max-width: 680px;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 4px;
+  padding: 20px 20px 12px;
+  margin-bottom: 32px;
+  box-shadow: inset 0 0 30px rgba(var(--cc-shadow-rgb), calc(0.5 * var(--cc-shadow-strength))), 0 2px 8px rgba(var(--cc-shadow-rgb), calc(0.3 * var(--cc-shadow-strength)));
+  animation: cf-grid-arrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+.cf-graph-title {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cc-text-3);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  margin: 0 0 16px 0;
+}
+
+.cf-graph-wrapper {
+  border-radius: 2px;
+}
+
+/* ── Action buttons ──────────────────────────────────────────── */
+/* A footer strip along the bottom of the results, full width, while
+   you scroll the lap review and the charts — "next track" is never a
+   scroll away. Full width and opaque so it reads as the screen's
+   footer, not as a panel floating over the numbers. The negative
+   margins cancel the screen's side padding (20px). */
+.cf-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px -20px 0;
+  padding: 12px 20px;
+  border-top: 1px solid var(--cc-border);
+  background: color-mix(in srgb, var(--cc-bg-2) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: cf-grid-arrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+}
+
+.cf-next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-kbd {
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+/* No keyboard to press it on. */
+@media (hover: none) {
+  .cf-kbd { display: none; }
+}
+
+/* Focused on arrival so screen readers start here; it is not in the
+   tab order, so no focus ring is ever needed on it. */
+.cf-title:focus { outline: none; }
+
+.f1-btn {
+  padding: 14px 36px;
+  font-family: var(--font-brand);
+  font-size: 1.062rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  border-radius: 2px;
+}
+
+.f1-btn.primary {
+  background: var(--cc-accent);
+  color: var(--cc-on-accent);
+  box-shadow: 0 0 16px rgba(var(--cc-accent-rgb), 0.2);
+}
+
+.f1-btn.primary:hover {
+  background: var(--cc-accent-bright);
+  box-shadow: 0 0 30px rgba(var(--cc-accent-rgb), 0.4);
+  transform: translateY(-1px);
+}
+
+.f1-btn.primary:active {
+  transform: scale(0.98) translateY(0);
+}
+
+.f1-btn.secondary {
+  background: transparent;
+  color: var(--cc-text);
+  border: 1px solid #444;
+}
+
+.f1-btn.secondary:hover {
+  border-color: var(--cc-text);
+  background: rgba(var(--cc-tint-rgb), 0.06);
+  box-shadow: 0 0 16px rgba(var(--cc-tint-rgb), 0.06);
+  transform: translateY(-1px);
+}
+
+.f1-btn.secondary:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* Share screenshot: the camera sits in the label's line, and the
+   button centres its content when the row stacks on a phone. */
+.f1-btn.cf-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.f1-btn.cf-share-btn svg {
+  flex-shrink: 0;
+  color: var(--cc-accent);
+}
+
+.f1-btn:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 3px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .light-typing-sandbox .lts-profile-wrapper {
+    top: 16px;
+    right: 16px;
+  }
+
+  .light-typing-sandbox .lts-profile-wrapper .lts-settings-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .lts-profile-dropdown {
+    min-width: 170px;
+    right: 0;
+  }
+
+  .settings-modal {
+    width: calc(100vw - 24px);
+    height: 85vh;
+    max-width: none;
+    border-radius: 12px;
+  }
+
+  .settings-seg-btn {
+    padding: 6px 11px;
+    font-size: 0.76rem;
+  }
+
+  .f1-dashboard {
+    gap: 6px;
+    /* Room on top for the logo and corner-button row. */
+    padding: 72px 16px 10px;
+    flex-wrap: wrap;
+  }
+
+  .light-typing-sandbox .lts-leaderboard-btn {
+    top: 16px;
+    right: 58px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .f1-module {
+    padding: 6px 12px;
+    min-width: 70px;
+  }
+
+  .f1-module-value {
+    font-size: 1rem;
+  }
+
+  .f1-module-label {
+    font-size: 0.64rem;
+  }
+
+  .f1-module-divider {
+    height: 28px;
+  }
+
+  .f1-track-container {
+    padding: 6px 16px;
+  }
+
+
+
+  .lts-code-area {
+    padding: 20px 16px 16px;
+  }
+
+  .lts-keyboard-area {
+    padding: 12px 8px 20px;
+  }
+
+  /* Phone sizing scales the chosen size down rather than replacing it,
+     so someone who picked Large still gets a larger phone size than
+     someone who picked Small. */
+  .light-typing-sandbox .code-display .rt-code-layer,
+  .light-typing-sandbox .code-display .rt-code-layer span,
+  .light-typing-sandbox .code-display pre[class*="language-"] {
+    font-size: calc(var(--race-font-size, 2rem) * 0.9) !important;
+    line-height: calc(var(--race-line-height, 1.8) * 0.78) !important;
+  }
+
+  .light-typing-sandbox .code-display {
+    /* Three lines at the resolved size. */
+    height: calc(
+      var(--race-font-size, 2rem) * 0.9 * var(--race-line-height, 1.8) * 0.78 * 3
+    ) !important;
+    max-height: calc(
+      var(--race-font-size, 2rem) * 0.9 * var(--race-line-height, 1.8) * 0.78 * 3
+    ) !important;
+  }
+
+  .f1-radio-container {
+    bottom: 12px;
+    right: 12px;
+    max-width: 280px;
+  }
+
+  /* Chequered Flag responsive */
+  .f1-chequered-flag-screen {
+    padding: 24px 16px;
+  }
+
+  .cf-title {
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+  }
+
+  .cf-subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+  }
+
+  .results-hero-car {
+    max-width: 95%;
+    margin: -50px auto -40px;
+  }
+
+  .waving-flag {
+    font-size: 2.5rem;
+    right: 0;
+    top: 22%;
+  }
+
+  .cf-header {
+    margin-bottom: 0;
+  }
+
+  .cf-telemetry-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .position-box {
+    grid-column: span 1;
+  }
+
+  .position-box .cf-value {
+    font-size: 3.5rem !important;
+  }
+
+  .cf-value {
+    font-size: 1.8rem;
+  }
+
+  .cf-stat-box {
+    padding: 16px 14px;
+  }
+
+  .cf-sector-summary {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .cf-sector-chip {
+    padding: 6px 14px;
+  }
+
+  .cf-graph-container {
+    max-width: 100%;
+    padding: 14px 10px 8px;
+  }
+
+  /* One compact row on a phone: stacked, three buttons would cover a
+     third of the screen for as long as the bar sticks. */
+  .cf-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .cf-actions .f1-btn {
+    flex: 1 1 auto;
+    padding: 11px 12px;
+    font-size: 0.95rem;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .cf-actions .f1-btn.primary { flex-basis: 100%; }
+
+  .f1-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Daily practice goal alert — pit-wall readout
+   ─────────────────────────────────────────────────────────────
+   Announces the daily target being met. Distinct from the race
+   engineer toasts on purpose: this fires once a day and deserves
+   to be read, so it is centred, larger and slower to leave.
+
+   Every colour comes from the theme tokens, so the panel follows
+   whichever of the five themes is active.
+   ══════════════════════════════════════════════════════════════ */
+.pg-alert-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 520;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* No backdrop and no pointer capture: the alert must never block
+     a race that is still running underneath it. */
+  pointer-events: none;
+  padding: 24px;
+}
+
+.pg-alert {
+  pointer-events: auto;
+  position: relative;
+  width: min(420px, 100%);
+  padding: 26px 28px 22px;
+  background: color-mix(in srgb, var(--cc-surface) 92%, transparent);
+  border: 1px solid var(--cc-border-strong);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba(var(--cc-accent-rgb), 0.12);
+  /* Cut corner, matching the auth pages' submit button. */
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 18px),
+    calc(100% - 18px) 100%,
+    0 100%
+  );
+  /* `forwards`, never `both`: with `both` the panel is pinned to the
+     `from` keyframe — opacity 0 — until the animation actually runs, so
+     anywhere frames are throttled (hidden tab, heavy load) the alert
+     would simply never appear. The resting style must already be the
+     final look; the animation only adds the entrance. */
+  animation: pg-alert-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pg-alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Chequered trim ──────────────────────────────────────────── */
+.pg-alert-flag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-image:
+    linear-gradient(45deg, var(--cc-text) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--cc-text) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--cc-text) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--cc-text) 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+  opacity: 0.55;
+}
+
+/* ── Registration marks ──────────────────────────────────────── */
+.pg-alert-mark {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(var(--cc-tint-rgb), 0.28);
+  pointer-events: none;
+}
+.pg-alert-mark-tl {
+  top: 10px;
+  left: 10px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+.pg-alert-mark-tr {
+  top: 10px;
+  right: 10px;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+.pg-alert-mark-bl {
+  bottom: 10px;
+  left: 10px;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+.pg-alert-mark-br {
+  bottom: 10px;
+  right: 10px;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+/* ── Header row ──────────────────────────────────────────────── */
+.pg-alert-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--cc-text-4);
+}
+
+.pg-alert-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cc-accent-bright);
+  box-shadow: 0 0 8px rgba(var(--cc-accent-bright-rgb), 0.9);
+  animation: pg-alert-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pg-alert-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pg-alert-status {
+  margin-left: auto;
+  color: var(--cc-success);
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.pg-alert-body {
+  margin-top: 16px;
+}
+
+.pg-alert-eyebrow {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--cc-text-3);
+}
+
+.pg-alert-time {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--cc-text);
+  text-shadow: 0 0 22px rgba(var(--cc-accent-rgb), 0.28);
+}
+
+.pg-alert-target {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cc-text-4);
+}
+
+/* ── Segmented bar ───────────────────────────────────────────── */
+.pg-alert-bars {
+  display: flex;
+  gap: 3px;
+  margin-top: 16px;
+}
+
+/* Lit at rest, for the same reason as the panel above: a segment that
+   only turns green via the animation's end state shows grey forever if
+   the animation never gets to run. The keyframe sweeps IN from grey. */
+.pg-alert-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--cc-success);
+  box-shadow: 0 0 8px rgba(0, 210, 106, 0.5);
+  animation: pg-alert-fill 0.3s ease-out backwards;
+}
+
+@keyframes pg-alert-fill {
+  from {
+    background: var(--cc-overlay);
+    box-shadow: none;
+  }
+}
+
+.pg-alert-msg {
+  margin: 14px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--cc-text-3);
+}
+
+/* ── Dismiss ─────────────────────────────────────────────────── */
+.pg-alert-dismiss {
+  margin-top: 18px;
+  width: 100%;
+  padding: 10px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--cc-text-2);
+  background: rgba(var(--cc-tint-rgb), 0.05);
+  border: 1px solid var(--cc-border);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.pg-alert-dismiss:hover {
+  color: var(--cc-text);
+  background: rgba(var(--cc-tint-rgb), 0.1);
+  border-color: var(--cc-border-strong);
+}
+
+.pg-alert-dismiss:focus-visible {
+  outline: 2px solid var(--cc-accent-bright);
+  outline-offset: 2px;
+}
+
+/* Nothing to restore here any more — the resting styles are already the
+   finished look, so dropping the animations is enough. */
+@media (prefers-reduced-motion: reduce) {
+  .pg-alert,
+  .pg-alert-bar,
+  .pg-alert-led {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .pg-alert {
+    padding: 22px 20px 18px;
+  }
+  .pg-alert-time {
+    font-size: 2.1rem;
+  }
+}
+
+/* ══ Practice progress readout (inside .settings-practice) ════ */
+.settings-practice-readout {
+  margin-left: auto;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--cc-text-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-practice-readout strong {
+  font-weight: 700;
+  color: var(--cc-text-2);
+}
+
+.settings-practice-readout.is-done strong {
+  color: var(--cc-success);
+}
+
+.settings-practice-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(var(--cc-tint-rgb), 0.08);
+  overflow: hidden;
+}
+
+.settings-practice-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--cc-accent-bright);
+  box-shadow: 0 0 10px rgba(var(--cc-accent-bright-rgb), 0.4);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settings-practice-bar-fill.is-done {
+  background: var(--cc-success);
+  box-shadow: 0 0 10px rgba(0, 210, 106, 0.45);
+}
+
+/* ── Range slider (audio volume) ─────────────────────────────── */
+.settings-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 140px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.settings-range:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--cc-accent-bright);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(var(--cc-accent-bright-rgb), 0.5);
+}
+
+.settings-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--cc-accent-bright);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(var(--cc-accent-bright-rgb), 0.5);
+}
+
+.settings-range:focus-visible {
+  outline: 2px solid var(--cc-accent-bright);
+  outline-offset: 3px;
+}
+
+/* ── Key sound picker ────────────────────────────────────────
+   A grid, because the switch list outgrew a segmented strip.
+   Mirrors the font picker so the two read as the same control. */
+.settings-sound-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px 0;
+}
+
+.settings-sound-block + .settings-section {
+  border-top: 1px solid rgba(var(--cc-tint-rgb), 0.05);
+}
+
+.settings-sound-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(94px, 1fr));
+  gap: 7px;
+}
+
+.settings-sound-btn {
+  padding: 8px 6px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cc-text-3);
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.settings-sound-btn:hover {
+  color: var(--cc-text);
+  border-color: var(--cc-border-strong);
+  background: rgba(var(--cc-tint-rgb), 0.06);
+}
+
+.settings-sound-btn:active {
+  transform: scale(0.96);
+}
+
+.settings-sound-btn.active {
+  color: var(--cc-on-accent);
+  background: var(--cc-accent-bright);
+  border-color: var(--cc-accent-bright);
+  box-shadow: 0 2px 12px rgba(var(--cc-accent-bright-rgb), 0.35);
+}
+
+.settings-sound-btn:focus-visible {
+  outline: 2px solid var(--cc-accent-bright);
+  outline-offset: 2px;
+}
+
+/* ── Custom snippet editor ───────────────────────────────────── */
+.settings-custom-input {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  max-height: 240px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  tab-size: 2;
+  color: var(--cc-text);
+  background: var(--cc-bg);
+  border: 1px solid var(--cc-border);
+  border-radius: 3px;
+  /* Preserve the paste exactly — a code field that reflows or
+     collapses runs of spaces would silently change what you typed. */
+  white-space: pre;
+  overflow: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-custom-input::placeholder {
+  color: var(--cc-text-4);
+}
+
+.settings-custom-input:focus {
+  outline: none;
+  border-color: var(--cc-accent-bright);
+  box-shadow: 0 0 0 1px rgba(var(--cc-accent-bright-rgb), 0.35);
+}
+
+.settings-custom-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.settings-mini-btn {
+  padding: 7px 16px;
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--cc-text-3);
+  background: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.settings-mini-btn:hover:not(:disabled) {
+  color: var(--cc-text);
+  border-color: var(--cc-border-strong);
+  background: rgba(var(--cc-tint-rgb), 0.08);
+}
+
+.settings-mini-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.settings-mini-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-mini-btn.is-primary:not(:disabled) {
+  color: var(--cc-on-accent);
+  background: var(--cc-accent-bright);
+  border-color: var(--cc-accent-bright);
+}
+
+.settings-mini-btn.is-primary:hover:not(:disabled) {
+  color: var(--cc-on-accent);
+  filter: brightness(1.1);
+}
+
+.settings-mini-btn:focus-visible {
+  outline: 2px solid var(--cc-accent-bright);
+  outline-offset: 2px;
+}
+
+/* Configuration the next track will use, under the results actions. */
+.cf-config-note {
+  margin: 14px 0 0;
+  padding-bottom: 72px;
+  text-align: center;
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cc-text-3);
+}
+
+/* What a warm-up lap leaves alone. Quiet on purpose: it qualifies
+   the numbers below it rather than celebrating anything. */
+.cf-warmup-note {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  max-width: min(68ch, 92%);
+  margin: 10px auto 4px;
+  padding: 6px 14px;
+  border: 1px solid var(--cc-border);
+  /* Not a full pill: on a narrow phone the line wraps, and a capsule
+     around two lines of text reads as a mistake. */
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--cc-text-3);
+}
+
+/* A challenge's verdict: won, tied, lost, or not yet a full lap. */
+.cf-challenge {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  max-width: min(60ch, 92%);
+  margin: 12px auto 4px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--cc-border);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--cc-text-2);
+}
+
+.cf-challenge.is-won {
+  border-color: color-mix(in srgb, var(--cc-success) 50%, transparent);
+  background: color-mix(in srgb, var(--cc-success) 10%, transparent);
+  color: var(--cc-success);
+}
+
+.cf-challenge.is-lost {
+  border-color: color-mix(in srgb, var(--cc-warning) 45%, transparent);
+  color: var(--cc-warning);
+}
+
+.cf-challenge.is-tied {
+  border-color: var(--cc-border-strong);
+  color: var(--cc-text);
+}
+
+/* Pool size in the next-track note — highlighted when it is the
+   reason "next track" keeps returning the same snippet. */
+.cf-config-pool {
+  color: var(--cc-text-3);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Danger zone — separated, last, and never inviting
+   ══════════════════════════════════════════════════════════════ */
+.settings-danger {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* Generous gap above so it never reads as the next settings card. */
+  margin-top: 32px;
+  padding: 18px;
+  /* Own border and tint rather than the card treatment, so it does
+     not read as one more settings card to skim past. */
+  border: 1px solid color-mix(in srgb, var(--cc-error) 40%, transparent);
+  border-radius: 3px;
+  background: rgba(var(--cc-error-rgb), 0.05);
+}
+
+.settings-danger-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-danger-title {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--cc-error);
+}
+
+.settings-danger-text {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--cc-text-4);
+  max-width: 62ch;
+}
+
+.settings-danger-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.settings-danger-ask {
+  font-family: var(--global-font, "JetBrains Mono", "Fira Code", monospace);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cc-warning);
+  white-space: nowrap;
+}
+
+/* Resting state is an outline, not a filled button — destructive
+   actions should look deliberate to press, not default. */
+.settings-mini-btn.is-danger-outline {
+  color: var(--cc-error);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--cc-error) 55%, transparent);
+  flex-shrink: 0;
+}
+
+.settings-mini-btn.is-danger-outline:hover:not(:disabled) {
+  color: var(--cc-error);
+  background: rgba(var(--cc-error-rgb), 0.12);
+  border-color: var(--cc-error);
+}
+
+@media (max-width: 700px) {
+  .settings-danger {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .settings-danger-actions {
+    justify-content: flex-end;
+  }
+}
+
+.settings-mini-btn.is-danger:not(:disabled) {
+  color: var(--cc-on-accent);
+  background: var(--cc-error);
+  border-color: var(--cc-error);
+}
+
+.settings-mini-btn.is-danger:hover:not(:disabled) {
+  color: var(--cc-on-accent);
+  filter: brightness(1.1);
+}
+
+/* ── Phones and narrow windows ────────────────────────────────────
+   At the desktop 2rem a phone fits about fourteen characters a line,
+   so code broke in the middle of names ("ackermann(in / t m"). The
+   chosen size still applies, capped where it would not fit. The
+   keyboard picture is about 720px wide and cannot fit at all. */
+@media (max-width: 640px) {
+  .light-typing-sandbox .code-display,
+  .light-typing-sandbox .code-display .rt-code-layer,
+  .light-typing-sandbox .code-display .rt-code-layer span,
+  .light-typing-sandbox .code-display pre[class*="language-"] {
+    font-size: min(var(--race-font-size, 2rem), 1.05rem) !important;
+    letter-spacing: 0.3px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .lts-keyboard-area {
+    display: none;
+  }
+}
+
+/* A phone's keyboard takes the bottom half of the screen once it is up,
+   so the code sits near the top instead of in the middle, and the page
+   is sized to the visible viewport rather than the one behind the
+   browser bars. The engineer speaks one line at a time, across the top
+   where only the logo would be hidden — three stacked toasts covered a
+   third of the screen. */
+@media (max-width: 640px) {
+  .light-typing-sandbox {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .lts-code-area {
+    justify-content: flex-start !important;
+    margin-top: 0;
+    padding-top: 28px !important;
+  }
+
+  .f1-radio-container {
+    top: 8px;
+    bottom: auto;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    flex-direction: column;
+  }
+
+  .f1-radio-toast:not(:last-child) {
+    display: none;
+  }
+
+  /* Solid here: it sits over the logo, which showed through. */
+  .f1-radio-toast {
+    padding: 8px 12px;
+    background: var(--cc-elevated);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* ── Lap review ───────────────────────────────────────────────
+   The finished lap with every key tinted by how long it took, a
+   replay caret, and the symbol fluency report under it. */
+.lap-review {
+  width: 100%;
+  max-width: 680px;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 4px;
+  padding: 18px 20px 16px;
+  margin-bottom: 32px;
+  animation: cf-grid-arrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
+}
+
+.lap-review-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.lap-review-title { margin-bottom: 4px; }
+
+.lap-review-sub {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cc-text-3);
+}
+
+.lap-review-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lap-review-play,
+.lap-review-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--cc-border-strong);
+  background: transparent;
+  color: var(--cc-text-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.lap-review-play {
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.lap-review-speeds {
+  display: inline-flex;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--cc-border-strong);
+}
+
+.lap-review-speed {
+  border: 0;
+  padding: 5px 9px;
+  font-family: var(--font-mono);
+}
+
+.lap-review-speed.is-active {
+  background: rgba(var(--cc-accent-rgb), 0.16);
+  color: var(--cc-text);
+}
+
+@media (hover: hover) {
+  .lap-review-play:hover { border-color: var(--cc-accent); color: var(--cc-text); }
+  .lap-review-speed:hover { color: var(--cc-text); }
+}
+
+.lap-review-play:focus-visible,
+.lap-review-speed:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+.lap-review-clock {
+  min-width: 4.5ch;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--cc-text-3);
+}
+
+.lap-review-code-wrap {
+  max-height: 280px;
+  overflow: auto;
+  border-radius: 4px;
+  background: var(--cc-bg-2);
+  border: 1px solid var(--cc-border);
+}
+
+.lap-review-code {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--cc-text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 4;
+}
+
+.lr-c {
+  border-radius: 2px;
+  transition: opacity 0.12s ease;
+}
+
+.lr-c.h0 { background: color-mix(in srgb, var(--cc-success) 16%, transparent); }
+.lr-c.h2 { background: color-mix(in srgb, var(--cc-warning) 20%, transparent); }
+.lr-c.h3 { background: color-mix(in srgb, var(--cc-warning) 22%, rgba(var(--cc-accent-rgb), 0.22)); }
+.lr-c.h4 { background: rgba(var(--cc-accent-rgb), 0.42); color: var(--cc-text); }
+
+.lr-c.is-missed {
+  text-decoration: underline wavy var(--cc-accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.lr-c.is-untyped { opacity: 0.35; background: none; }
+
+/* Replaying: what the caret has not reached yet waits, untinted. */
+.lap-review-code.is-replaying .lr-c:not(.is-done) {
+  opacity: 0.25;
+  background: none;
+  text-decoration: none;
+}
+
+.lap-review-caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--cc-accent);
+  box-shadow: 0 0 8px rgba(var(--cc-accent-rgb), 0.8);
+  border-radius: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lap-review-code.is-replaying .lap-review-caret { opacity: 1; }
+
+.lap-review-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--cc-text-3);
+}
+
+.lap-review-legend i {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border: 1px solid var(--cc-border);
+}
+
+.lap-review-legend-miss {
+  margin-left: 12px;
+  text-decoration: underline wavy var(--cc-accent);
+  text-underline-offset: 3px;
+}
+
+/* ── Symbol fluency ── */
+.symbol-fluency {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cc-border);
+}
+
+.symbol-fluency-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cc-text-3);
+}
+
+.symbol-fluency-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--cc-text-2);
+}
+
+.symbol-fluency-rows {
+  display: grid;
+  gap: 10px;
+}
+
+.symbol-fluency-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.symbol-fluency-label {
+  min-width: 13em;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cc-text-3);
+}
+
+.symbol-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.symbol-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 3px 4px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--cc-warning) 40%, transparent);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cc-text-2);
+}
+
+.symbol-chip code {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cc-warning) 18%, transparent);
+  color: var(--cc-text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.symbol-chip.is-miss { border-color: rgba(var(--cc-accent-rgb), 0.45); }
+.symbol-chip.is-miss code { background: rgba(var(--cc-accent-rgb), 0.18); }
+
+/* An in-panel action, so Saira like the panel's other controls; the
+   script face stays with the screen's main actions. */
+.f1-btn.symbol-drill-btn {
+  margin-top: 14px;
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.start-hint-ghost {
+  color: var(--cc-text-4);
+}
+
+@media (max-width: 640px) {
+  .lap-review { padding: 14px 12px; }
+  .lap-review-code { font-size: 0.78rem; padding: 12px; }
+  .symbol-fluency-label { min-width: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lr-c { transition: none; }
+}
+
+/* ── Trophies earned on this lap ── */
+.cf-trophies {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px auto 4px;
+  max-width: min(680px, 94%);
+}
+
+.cf-trophy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 10px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--cc-warning) 45%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--cc-warning) 12%, transparent), var(--cc-surface) 70%);
+  color: var(--cc-text);
+  text-align: left;
+  cursor: pointer;
+  animation: cf-trophy-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cf-trophy:focus-visible { outline: 2px solid var(--cc-accent); outline-offset: 2px; }
+
+@media (hover: hover) {
+  .cf-trophy:hover { border-color: var(--cc-warning); }
+}
+
+.cf-trophy-text { display: grid; gap: 1px; }
+
+.cf-trophy-kicker {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--cc-warning);
+}
+
+.cf-trophy-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.cf-trophy-blurb { font-size: 0.78rem; color: var(--cc-text-3); }
+
+@keyframes cf-trophy-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-trophy { animation: none; }
+}
+
+
+/* ── First-visit tips (components/race/Onboarding.jsx) ── */
+.onboard {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 501;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 26px 26px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--cc-border);
+  background: var(--cc-elevated);
+  color: var(--cc-text);
+  box-shadow: 0 30px 80px rgba(var(--cc-shadow-rgb), calc(0.6 * var(--cc-shadow-strength)));
+  animation: onboard-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes onboard-in {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.onboard-eyebrow { margin: 0; font-size: 1.1rem; color: light-dark(color-mix(in srgb, var(--cc-accent) 75%, #000), var(--cc-accent)); }
+
+.onboard-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.onboard-sub { margin: 4px 0 16px; font-size: 0.9rem; color: var(--cc-text-3); }
+
+.onboard-tips {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboard-tip {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.onboard-tip > span:last-child { display: grid; gap: 2px; }
+
+.onboard-tip strong {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+}
+
+.onboard-tip > span:last-child > span {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--cc-text-2);
+}
+
+.onboard-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(var(--cc-accent-rgb), 0.12);
+  color: var(--cc-accent);
+}
+
+.onboard-foot {
+  margin: 16px 0 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cc-border);
+  font-size: 0.84rem;
+  color: var(--cc-text-3);
+}
+
+.onboard-foot strong { color: var(--cc-text-2); font-family: var(--font-display); }
+
+.f1-btn.onboard-go { width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .onboard { animation: none; }
+}

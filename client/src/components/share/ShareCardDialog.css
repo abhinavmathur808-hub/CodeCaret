@@ -1,0 +1,445 @@
+/* ═══════════════════════════════════════════════════════════════
+   ShareCardDialog.css — "Share your lap"
+   ─────────────────────────────────────────────────────────────
+   Reuses .settings-modal-backdrop and .settings-modal-close from
+   TestTyping.css, like the leaderboard. Both sit above the results
+   screen (z-index 9999) that opens this.
+   ═══════════════════════════════════════════════════════════════ */
+
+.settings-modal-backdrop.sc-backdrop {
+  z-index: 10000;
+}
+
+.sc-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+  width: min(940px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 80px rgba(var(--cc-shadow-rgb), calc(0.7 * var(--cc-shadow-strength))),
+    0 0 0 1px rgba(var(--cc-tint-rgb), 0.04);
+  overflow: hidden;
+  outline: none;
+  animation: sc-modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes sc-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.sc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid var(--cc-elevated);
+  flex-shrink: 0;
+}
+
+.sc-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cc-text);
+}
+
+/* ── Body: the card beside what to do with it ────────────────── */
+.sc-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-content: start;
+  gap: 24px;
+  padding: 22px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* The card sits on a faint chequer — the flag, again, and a plain
+   way to show where the image's own edges are. */
+.sc-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* No min-height: 0 here. With it, a short viewport let the grid row
+     shrink below the image, which then spilled over the size picker. */
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--cc-border);
+  background:
+    repeating-conic-gradient(rgba(var(--cc-tint-rgb), 0.035) 0 25%, transparent 0 50%) 0 0 / 22px 22px,
+    var(--cc-bg-2);
+}
+
+.sc-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.sc-image,
+.sc-placeholder {
+  display: block;
+  max-width: 100%;
+  max-height: min(62vh, 560px);
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.sc-image {
+  width: auto;
+  height: auto;
+  transition: opacity 0.2s ease;
+}
+
+.sc-image.is-stale {
+  opacity: 0.35;
+}
+
+.sc-placeholder {
+  height: min(62vh, 560px);
+  aspect-ratio: var(--sc-ratio);
+  background: rgba(var(--cc-tint-rgb), 0.04);
+}
+
+.sc-spinner {
+  position: absolute;
+  color: var(--cc-accent);
+  animation: sc-spin 0.8s linear infinite;
+}
+
+@keyframes sc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sc-failed {
+  position: absolute;
+  inset: auto 12px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--cc-text-2);
+}
+
+/* ── Controls ────────────────────────────────────────────────── */
+.sc-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.sc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sc-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cc-text-3);
+}
+
+/* Card size: three options side by side, each naming its use. */
+.sc-formats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sc-format {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px 12px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--cc-border);
+  background: transparent;
+  color: var(--cc-text-2);
+  font-family: var(--font-display);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.sc-format svg {
+  margin-bottom: 4px;
+  color: var(--cc-text-3);
+}
+
+.sc-format.is-on {
+  border-color: var(--cc-accent);
+  background: rgba(var(--cc-accent-rgb), 0.1);
+  color: var(--cc-text);
+}
+
+.sc-format.is-on svg {
+  color: var(--cc-accent);
+}
+
+.sc-format-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.sc-format-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--cc-text-3);
+  line-height: 1.25;
+}
+
+/* Post to: one tile per platform, logo over name. */
+.sc-platforms {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sc-platform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 2px 9px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cc-text-2);
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.sc-platform svg {
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.sc-platform:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+.sc-platform-name {
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sc-note {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--cc-text-3);
+}
+
+/* Save: the share sheet (where there is one), download and copy. */
+.sc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--cc-elevated);
+}
+
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-radius: 9px;
+  border: 1px solid var(--cc-border-strong);
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.sc-btn.is-primary {
+  border-color: transparent;
+  background: var(--cc-accent);
+  color: var(--cc-on-accent);
+  box-shadow: 0 0 16px rgba(var(--cc-accent-rgb), 0.2);
+}
+
+.sc-btn:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+/* Hover only where there is a pointer that hovers: on a touch screen
+   a tapped button would otherwise keep its hover look afterwards. */
+@media (hover: hover) {
+  .sc-format:hover {
+    border-color: var(--cc-border-strong);
+    background: rgba(var(--cc-tint-rgb), 0.04);
+    color: var(--cc-text);
+  }
+
+  .sc-platform:hover:not(:disabled) {
+    background: rgba(var(--cc-tint-rgb), 0.05);
+    border-color: var(--cc-border);
+    color: var(--cc-text);
+  }
+
+  .sc-platform:hover:not(:disabled) svg {
+    transform: translateY(-2px);
+  }
+
+  .sc-btn:hover:not(:disabled) {
+    background: var(--cc-elevated);
+  }
+
+  .sc-btn.is-primary:hover:not(:disabled) {
+    background: var(--cc-accent-bright);
+    box-shadow: 0 0 26px rgba(var(--cc-accent-rgb), 0.35);
+  }
+}
+
+.sc-format:focus-visible,
+.sc-platform:focus-visible,
+.sc-btn:focus-visible,
+.sc-status a:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+}
+
+.sc-status {
+  margin: -6px 0 0;
+  min-height: 2.6em;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--cc-success, #22c55e);
+}
+
+.sc-status.is-error {
+  color: var(--cc-error, #f87171);
+}
+
+.sc-status a {
+  color: var(--cc-accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Narrow screens: the card on top, everything else below ─── */
+@media (max-width: 760px) {
+  .sc-modal {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    max-height: 94dvh;
+    transform: none;
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+    animation-name: sc-sheet-in;
+  }
+
+  @keyframes sc-sheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  .sc-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 16px;
+  }
+
+  .sc-preview {
+    padding: 12px;
+  }
+
+  .sc-image,
+  .sc-placeholder {
+    max-height: 34dvh;
+  }
+
+  .sc-placeholder {
+    height: 34dvh;
+  }
+
+  /* All six in one row: the sheet is for posting, so the platforms
+     belong above the fold rather than a scroll down. */
+  .sc-platforms {
+    gap: 0;
+  }
+
+  .sc-platform {
+    gap: 5px;
+    padding: 8px 0 7px;
+  }
+
+  .sc-platform svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sc-platform-name {
+    font-size: 0.64rem;
+  }
+
+  .sc-actions .sc-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-modal {
+    animation: none;
+  }
+
+  .sc-spinner {
+    animation-duration: 2.4s;
+  }
+}

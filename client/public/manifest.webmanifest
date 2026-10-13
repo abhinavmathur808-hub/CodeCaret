@@ -1,0 +1,15 @@
+{
+  "name": "CodeCaret — the typing simulator for code",
+  "short_name": "CodeCaret",
+  "description": "Race real C++, Python and JavaScript snippets against the clock, with live WPM telemetry, ghost laps and a podium for every track.",
+  "start_url": "/test",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,34 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment files hold local settings; only the .example template
+# belongs in the repository. Also set by the root .gitignore — repeated
+# here so this folder is safe on its own (e.g. as a Vercel root).
+.env
+.env.*
+!.env.example
+
+# Vercel CLI project link
+.vercel
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

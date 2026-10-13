@@ -1,0 +1,847 @@
+/* ═══════════════════════════════════════════════════════════════
+   LeaderboardModal.css — Dark F1 Global Rankings
+   ─────────────────────────────────────────────────────────────
+   Reuses .settings-modal-backdrop and .settings-modal-close
+   from TestTyping.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Modal panel ─────────────────────────────────────────────── */
+.lb-modal {
+  /* Medal colours, per scheme. Pure #ffd700 gold is a lovely glow on
+     a dark palette and close to illegible as text on a white one, so
+     each medal resolves to a deeper tone when the active palette
+     declares `color-scheme: light` — which every light palette does.
+     Defined once here; every podium element reads these. */
+  --lb-gold: light-dark(#9a7400, #ffd700);
+  --lb-silver: light-dark(#5f6875, #c0c0c0);
+  --lb-bronze: light-dark(#9a5a1c, #cd7f32);
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Above the results screen (9999), because "View podium" opens this
+     FROM the results screen — at the old 501 it opened behind it,
+     invisible, with the race page still blocking every click. */
+  z-index: 10001;
+  width: 95vw;
+  max-width: 600px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 80px rgba(var(--cc-shadow-rgb), calc(0.7 * var(--cc-shadow-strength))),
+    0 0 0 1px rgba(var(--cc-tint-rgb), 0.04),
+    0 0 60px rgba(255, 215, 0, 0.04);
+  overflow: hidden;
+  animation: lb-modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes lb-modal-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Its backdrop has to clear the results screen too, or the dimming
+   and click-outside-to-close would both happen underneath it. */
+.settings-modal-backdrop.lb-backdrop {
+  z-index: 10000;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--cc-elevated);
+  flex-shrink: 0;
+}
+
+.lb-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--lb-gold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.lb-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lb-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lb-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lb-body::-webkit-scrollbar-thumb {
+  background: var(--cc-border);
+  border-radius: 3px;
+}
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.lb-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 60px 20px;
+}
+
+.lb-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--cc-border);
+  border-top-color: #ffd700;
+  border-radius: 50%;
+  animation: lb-spin 0.7s linear infinite;
+}
+
+@keyframes lb-spin {
+  to { transform: rotate(360deg); }
+}
+
+.lb-loading-text {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--cc-text-4);
+}
+
+/* ── Error / Empty ───────────────────────────────────────────── */
+.lb-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--cc-error);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+.lb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 20px;
+}
+
+.lb-empty-text {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--cc-text-4);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Champion Card (#1)
+   ═══════════════════════════════════════════════════════════════ */
+.lb-champion-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 215, 0, 0.06) 0%, rgba(255, 215, 0, 0.02) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-champion-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  border-radius: 4px 0 0 4px;
+}
+
+.lb-champion-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 215, 0, 0.08);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.lb-champion-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.lb-champion-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.lb-champion-name {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cc-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-champion-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lb-champion-wpm {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffd700;
+  line-height: 1;
+}
+
+.lb-champion-wpm-label {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #8a7b2e;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Rankings Table
+   ═══════════════════════════════════════════════════════════════ */
+.lb-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--cc-elevated);
+  border-radius: 12px;
+  background: var(--cc-bg-2);
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+}
+
+.lb-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--cc-text-4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--cc-elevated);
+  white-space: nowrap;
+}
+
+.lb-table td {
+  padding: 10px 14px;
+  color: var(--cc-text-2);
+  border-bottom: 1px solid var(--cc-border);
+  white-space: nowrap;
+}
+
+.lb-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lb-table tbody tr:hover td {
+  background: rgba(var(--cc-tint-rgb), 0.02);
+}
+
+/* ── Rank column ─────────────────────────────────────────────── */
+.lb-td-rank {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  color: var(--cc-text-4);
+  width: 48px;
+  text-align: center;
+}
+
+.lb-medal {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ── Silver row (#2) ─────────────────────────────────────────── */
+.lb-rank-silver td {
+  background: rgba(192, 192, 192, 0.03);
+}
+
+.lb-rank-silver .lb-td-rank {
+  color: #c0c0c0;
+}
+
+.lb-rank-silver .lb-td-name {
+  color: #d0d0d0;
+}
+
+.lb-rank-silver .lb-td-wpm {
+  color: #c0c0c0;
+}
+
+/* ── Bronze row (#3) ─────────────────────────────────────────── */
+.lb-rank-bronze td {
+  background: rgba(205, 127, 50, 0.03);
+}
+
+.lb-rank-bronze .lb-td-rank {
+  color: #cd7f32;
+}
+
+.lb-rank-bronze .lb-td-name {
+  color: #d0b090;
+}
+
+.lb-rank-bronze .lb-td-wpm {
+  color: #cd7f32;
+}
+
+/* ── Self-highlight (current user) ───────────────────────────── */
+.lb-row-self td {
+  background: rgba(var(--cc-accent-bright-rgb), 0.06) !important;
+}
+
+.lb-td-name-self {
+  color: var(--cc-accent-bright) !important;
+}
+
+.lb-you-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  background: rgba(var(--cc-accent-bright-rgb), 0.15);
+  border: 1px solid rgba(var(--cc-accent-bright-rgb), 0.3);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--cc-accent-bright);
+  letter-spacing: 0.03em;
+  text-transform: none;
+  vertical-align: middle;
+}
+
+/* ── Name column ─────────────────────────────────────────────── */
+.lb-td-name {
+  font-weight: 600;
+  color: #d0d0d0;
+}
+
+/* ── WPM column ──────────────────────────────────────────────── */
+.lb-td-wpm {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  color: var(--cc-accent-bright);
+}
+
+/* ── Avg column ──────────────────────────────────────────────── */
+.lb-td-avg {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  color: var(--cc-text-3);
+}
+
+/* ── Muted column ────────────────────────────────────────────── */
+.lb-td-muted {
+  color: var(--cc-untyped);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Tabs — This track / Global
+   ═══════════════════════════════════════════════════════════════ */
+.lb-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 16px 24px 0;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--cc-bg-2);
+  border: 1px solid var(--cc-elevated);
+  flex-shrink: 0;
+}
+
+.lb-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--cc-text-4);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lb-tab:hover:not(.is-active) {
+  color: var(--cc-text-2);
+}
+
+.lb-tab.is-active {
+  background: var(--cc-surface);
+  color: var(--lb-gold);
+  box-shadow: 0 1px 4px rgba(var(--cc-shadow-rgb), calc(0.35 * var(--cc-shadow-strength)));
+}
+
+.lb-tab:focus-visible {
+  outline: 2px solid var(--lb-gold);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Track panel
+   The podium for the snippet on screen. Medal colours come from the
+   --lb-* tokens on .lb-modal, so every piece of it follows the theme.
+   ═══════════════════════════════════════════════════════════════ */
+.lb-track {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Which track this is ─────────────────────────────────────── */
+.lb-track-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lb-track-id {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.lb-track-label,
+.lb-track-count span {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--cc-text-3);
+}
+
+.lb-track-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cc-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-track-meta {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: var(--cc-text-3);
+}
+
+.lb-track-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.lb-track-count strong {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cc-text-2);
+}
+
+/* ── The podium ──────────────────────────────────────────────── */
+/* An ordered list in rank order (P1, P2, P3) — that is what assistive
+   tech reads — rearranged into the classic P2 · P1 · P3 silhouette by
+   `order`. Steps sit on a shared floor, so different block heights
+   read as one podium rather than three bars. */
+.lb-podium {
+  list-style: none;
+  margin: 0;
+  padding: 6px 4px 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 10px;
+  border-bottom: 2px solid var(--cc-border-strong);
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    color-mix(in srgb, var(--lb-gold) 8%, transparent),
+    transparent 72%
+  );
+}
+
+.lb-step {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lb-step-p1 { order: 2; --medal: var(--lb-gold); }
+.lb-step-p2 { order: 1; --medal: var(--lb-silver); }
+.lb-step-p3 { order: 3; --medal: var(--lb-bronze); }
+
+.lb-step-racer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 8px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 0;
+}
+
+.lb-step-name {
+  max-width: 100%;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--cc-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* In a stacked column the badge sits on its own line, so the inline
+   margin it carries for table rows would only push it off-centre. */
+.lb-step-racer .lb-you-badge {
+  margin-left: 0;
+}
+
+.lb-step-wpm {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--medal);
+}
+
+.lb-step-p1 .lb-step-wpm {
+  font-size: 1.85rem;
+}
+
+.lb-step-wpm small,
+.lb-standing-stat small {
+  margin-left: 3px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cc-text-4);
+}
+
+.lb-step-acc {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--cc-text-3);
+}
+
+.lb-step-block {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  border: 1px solid color-mix(in srgb, var(--medal) 38%, transparent);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--medal) 18%, transparent),
+    color-mix(in srgb, var(--medal) 4%, transparent)
+  );
+}
+
+.lb-step-p1 .lb-step-block { height: 76px; }
+.lb-step-p2 .lb-step-block { height: 54px; }
+.lb-step-p3 .lb-step-block { height: 38px; }
+
+.lb-step-pos {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--medal);
+}
+
+/* An open place: still a step — the podium keeps its shape — but
+   drawn in outline, so it reads as available rather than missing. */
+.lb-step.is-open .lb-step-block {
+  border: 1px dashed var(--cc-border-strong);
+  border-bottom: 0;
+  background: transparent;
+}
+
+.lb-step.is-open .lb-step-pos {
+  color: var(--cc-text-4);
+}
+
+.lb-step-open {
+  padding: 22px 0 6px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--cc-text-4);
+}
+
+/* You, on the podium. */
+.lb-step.is-me .lb-step-racer {
+  background: rgba(var(--cc-accent-bright-rgb), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--cc-accent-bright-rgb), 0.35);
+}
+
+.lb-step.is-me .lb-step-name {
+  color: var(--cc-accent-bright);
+}
+
+.lb-podium-invite {
+  margin: -4px 0 0;
+  text-align: center;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.86rem;
+  color: var(--cc-text-3);
+}
+
+/* ── Your standing ───────────────────────────────────────────── */
+.lb-standing {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--cc-elevated);
+  background: var(--cc-bg-2);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--cc-text-2);
+}
+
+.lb-standing .lb-you-badge {
+  margin-left: 0;
+}
+
+.lb-standing.is-muted {
+  justify-content: space-between;
+  color: var(--cc-text-3);
+}
+
+.lb-standing.is-podium {
+  border-color: rgba(var(--cc-accent-bright-rgb), 0.3);
+  background: rgba(var(--cc-accent-bright-rgb), 0.05);
+}
+
+.lb-standing-text strong,
+.lb-standing-pos {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
+  color: var(--cc-text);
+}
+
+.lb-standing-pos {
+  font-size: 1rem;
+}
+
+.lb-standing-stat {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cc-accent-bright);
+}
+
+.lb-standing-stat.is-dim {
+  font-weight: 600;
+  color: var(--cc-text-3);
+}
+
+.lb-standing-gap {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--cc-text-3);
+}
+
+.lb-standing-action {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--cc-border-strong);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cc-text);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.lb-standing-action:hover {
+  background: var(--cc-elevated);
+}
+
+.lb-standing-action:focus-visible {
+  outline: 2px solid var(--lb-gold);
+  outline-offset: 2px;
+}
+
+/* ── Footnote and the no-board state ─────────────────────────── */
+.lb-track-rules {
+  margin: 0;
+  text-align: center;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.72rem;
+  color: var(--cc-text-4);
+}
+
+.lb-track-none {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 16px;
+  text-align: center;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.lb-track-none-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cc-text-2);
+}
+
+.lb-track-none-text {
+  font-size: 0.82rem;
+  color: var(--cc-text-3);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 520px) {
+  .lb-tabs {
+    margin: 12px 16px 0;
+  }
+
+  .lb-podium {
+    gap: 6px;
+  }
+
+  .lb-step-wpm {
+    font-size: 1.15rem;
+  }
+
+  .lb-step-p1 .lb-step-wpm {
+    font-size: 1.4rem;
+  }
+
+  .lb-step-p1 .lb-step-block { height: 60px; }
+  .lb-step-p2 .lb-step-block { height: 44px; }
+  .lb-step-p3 .lb-step-block { height: 32px; }
+
+  .lb-standing-gap {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .lb-modal {
+    width: calc(100vw - 16px);
+    max-height: 92vh;
+    border-radius: 12px;
+  }
+
+  .lb-body {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .lb-champion-card {
+    padding: 16px 18px;
+    gap: 12px;
+  }
+
+  .lb-champion-badge {
+    width: 44px;
+    height: 44px;
+  }
+
+  .lb-champion-badge svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lb-champion-name {
+    font-size: 0.95rem;
+  }
+
+  .lb-champion-wpm {
+    font-size: 1.4rem;
+  }
+}
+
+/* Driver names lead to their driver pages. */
+.lb-driver-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lb-driver-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lb-driver-link:focus-visible {
+  outline: 2px solid var(--cc-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}

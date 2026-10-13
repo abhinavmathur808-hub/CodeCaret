@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="og-glow" cx="0.72" cy="0.62" r="0.6">
+      <stop offset="0" stop-color="#e10600" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#e10600" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="og-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.04"/>
+    </pattern>
+    <pattern id="og-check" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#f4f4f5"/><rect width="12" height="12" fill="#111"/><rect x="12" y="12" width="12" height="12" fill="#111"/>
+    </pattern>
+    <linearGradient id="og-fade-x" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.08" stop-color="#fff"/><stop offset="0.93" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="og-fade-y" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.16" stop-color="#fff"/><stop offset="0.84" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="og-mask-x" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#og-fade-x)"/></mask>
+    <mask id="og-mask-y" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#og-fade-y)"/></mask>
+    <filter id="og-white"><feColorMatrix type="matrix" values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="#08090b"/>
+  <rect width="1200" height="630" fill="url(#og-grid)"/>
+  <rect width="1200" height="630" fill="url(#og-glow)"/>
+  <image href="../public/logo-mark.png" x="64" y="44" width="250" height="125" preserveAspectRatio="xMinYMid meet" filter="url(#og-white)"/>
+  <text x="70" y="252" font-family="Saira" font-weight="800" font-size="70" fill="#ffffff">The typing</text>
+  <text x="70" y="330" font-family="Saira" font-weight="800" font-size="70" fill="#ffffff">simulator for <tspan fill="#e10600">code</tspan></text>
+  <text x="72" y="384" font-family="Inter" font-size="26" fill="#a1a1aa">Race real C++, Python and JavaScript</text>
+  <text x="72" y="418" font-family="Inter" font-size="26" fill="#a1a1aa">snippets against the clock.</text>
+  <g font-family="Saira" font-weight="600" font-size="19" fill="#e4e4e7">
+    <rect x="70" y="452" width="176" height="38" rx="19" fill="none" stroke="#3f3f46"/><text x="158" y="477" text-anchor="middle">Live telemetry</text>
+    <rect x="258" y="452" width="140" height="38" rx="19" fill="none" stroke="#3f3f46"/><text x="328" y="477" text-anchor="middle">Ghost laps</text>
+    <rect x="410" y="452" width="178" height="38" rx="19" fill="none" stroke="#3f3f46"/><text x="499" y="477" text-anchor="middle">Track podiums</text>
+  </g>
+  <g font-family="JetBrains Mono" font-size="22">
+    <rect x="626" y="96" width="512" height="92" rx="14" fill="#111216" stroke="#26272d"/>
+    <text x="650" y="134"><tspan fill="#c792ea">for</tspan><tspan fill="#e4e4e7"> (</tspan><tspan fill="#c792ea">auto</tspan><tspan fill="#e4e4e7">&amp; lap : laps)</tspan></text>
+    <text x="676" y="168"><tspan fill="#e4e4e7">best = </tspan><tspan fill="#82aaff">max</tspan><tspan fill="#e4e4e7">(</tspan><tspan fill="#52525b">best, lap);</tspan></text>
+    <rect x="822" y="149" width="3" height="27" fill="#e10600"/>
+  </g>
+  <svg x="592" y="320" width="608" height="192" viewBox="-40 300 1616 510" preserveAspectRatio="xMidYMid meet">
+    <g mask="url(#og-mask-x)"><g mask="url(#og-mask-y)">
+      <image href="../src/assets/ckl.png" x="0" y="0" width="1536" height="1024" style="mix-blend-mode:lighten"/>
+    </g></g>
+  </svg>
+  <rect y="606" width="1200" height="24" fill="url(#og-check)"/>
+</svg>

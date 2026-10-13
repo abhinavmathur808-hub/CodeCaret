@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Environment files hold secrets (JWT secret, OAuth secret, database
+# and SMTP credentials); only the .example template belongs in the
+# repository. Also set by the root .gitignore — repeated here so this
+# folder is safe on its own.
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*

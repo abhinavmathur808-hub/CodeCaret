@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files hold secrets; only the .example templates belong in
+# the repository.
+.env
+.env.*
+!.env.example
+
+# Logs and tool caches
+*.log
+npm-debug.log*
+.vite/
+coverage/
+
+# Operating system files
+.DS_Store
+Thumbs.db

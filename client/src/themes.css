@@ -1,0 +1,711 @@
+/* ═══════════════════════════════════════════════════════════════
+   themes.css — CodeCaret colour themes  (GENERATED palettes)
+   ─────────────────────────────────────────────────────────────
+   The palette blocks below are emitted by scripts/genThemes.cjs,
+   which refuses to write them unless every palette clears its
+   contrast gates. Edit the palettes there, not here.
+
+   One palette per `data-theme` value on <html>. Every themeable
+   colour in the app resolves to a --cc-* token, so adding a theme
+   means adding a palette in the generator and an entry in
+   src/themes.js — no component changes.
+
+   `:root[data-theme="…"]` is used (rather than bare `[data-theme]`)
+   so these always outrank the unthemed `:root` defaults and the
+   variables Tailwind emits from @theme, regardless of file order.
+
+   Naming:
+     bg / bg-2         page background, and a slightly lifted variant
+     surface           raised panels, cards, modals
+     overlay           inputs, chips, wells sitting on a surface
+     elevated          table rows, tooltips, the topmost layer
+     border            hairlines; -strong for emphasised dividers
+     accent            brand colour — caret, buttons, progress
+     accent-bright     the more intense variant used on hover. On dark
+                       palettes that is lighter; on light palettes it
+                       is DARKER, so "more intense" holds either way.
+     accent-dim        the far end of accent gradients
+     on-accent         text/icons drawn on top of an accent fill
+     text … text-4     primary → most muted text
+     untyped           not-yet-typed characters (deliberately recessive)
+     error/success/warning  status colours, deliberately NOT derived
+                       from the accent so a mistake always reads as a
+                       mistake. The generator asserts that error and
+                       accent differ in hue or lightness.
+     tint-rgb          overlay colour for hovers and inner highlights:
+                       white on dark palettes, black on light ones.
+     logo-filter/blend how the wordmark art adapts to the background.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Carbon — F1 livery — black & racing red ──────── */
+:root,
+:root[data-theme="carbon"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #0a0a0a;
+  --cc-bg-2: #0d0d0d;
+  --cc-surface: #111111;
+  --cc-surface-rgb: 17, 17, 17;
+  --cc-overlay: #1a1a1a;
+  --cc-elevated: #1e1e1e;
+  --cc-border: #2a2a2a;
+  --cc-border-strong: #333333;
+
+  --cc-accent: #e10600;
+  --cc-accent-rgb: 225, 6, 0;
+  --cc-accent-bright: #ff1801;
+  --cc-accent-bright-rgb: 255, 24, 1;
+  --cc-accent-dim: #cc0500;
+  --cc-on-accent: #ffffff;
+
+  --cc-text: #ffffff;
+  --cc-text-2: #e0e0e0;
+  --cc-text-3: #8a8a8a;
+  --cc-text-4: #5a5a5a;
+  --cc-untyped: #5a5a5a;
+
+  --cc-error: #ff4444;
+  --cc-error-rgb: 255, 68, 68;
+  --cc-success: #00d26a;
+  --cc-warning: #ffd000;
+}
+
+/* ── Midnight — Deep navy with a sky-blue accent ──── */
+:root[data-theme="midnight"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #060910;
+  --cc-bg-2: #090e19;
+  --cc-surface: #0c1220;
+  --cc-surface-rgb: 12, 18, 32;
+  --cc-overlay: #121a2c;
+  --cc-elevated: #16203a;
+  --cc-border: #223049;
+  --cc-border-strong: #2e4062;
+
+  --cc-accent: #38bdf8;
+  --cc-accent-rgb: 56, 189, 248;
+  --cc-accent-bright: #7dd3fc;
+  --cc-accent-bright-rgb: 125, 211, 252;
+  --cc-accent-dim: #0ea5e9;
+  --cc-on-accent: #04121f;
+
+  --cc-text: #f0f6ff;
+  --cc-text-2: #d7e3f4;
+  --cc-text-3: #8ea3c0;
+  --cc-text-4: #5c6f8c;
+  --cc-untyped: #3a4761;
+
+  --cc-error: #ff5c5c;
+  --cc-error-rgb: 255, 92, 92;
+  --cc-success: #34d399;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Verdant — Forest black with emerald ──────────── */
+:root[data-theme="verdant"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #05100b;
+  --cc-bg-2: #071510;
+  --cc-surface: #0a1a12;
+  --cc-surface-rgb: 10, 26, 18;
+  --cc-overlay: #10241a;
+  --cc-elevated: #142c20;
+  --cc-border: #1e3d2c;
+  --cc-border-strong: #2a5240;
+
+  --cc-accent: #34d399;
+  --cc-accent-rgb: 52, 211, 153;
+  --cc-accent-bright: #6ee7b7;
+  --cc-accent-bright-rgb: 110, 231, 183;
+  --cc-accent-dim: #10b981;
+  --cc-on-accent: #04140d;
+
+  --cc-text: #eefaf3;
+  --cc-text-2: #cfe9dc;
+  --cc-text-3: #86a99a;
+  --cc-text-4: #5a7568;
+  --cc-untyped: #38524a;
+
+  --cc-error: #ff6b6b;
+  --cc-error-rgb: 255, 107, 107;
+  --cc-success: #34d399;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Solar — Warm espresso with amber ─────────────── */
+:root[data-theme="solar"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #100b04;
+  --cc-bg-2: #161007;
+  --cc-surface: #1b1309;
+  --cc-surface-rgb: 27, 19, 9;
+  --cc-overlay: #251b0e;
+  --cc-elevated: #2d2112;
+  --cc-border: #3d2e18;
+  --cc-border-strong: #54401f;
+
+  --cc-accent: #fbbf24;
+  --cc-accent-rgb: 251, 191, 36;
+  --cc-accent-bright: #fcd34d;
+  --cc-accent-bright-rgb: 252, 211, 77;
+  --cc-accent-dim: #d97706;
+  --cc-on-accent: #171003;
+
+  --cc-text: #fff7ea;
+  --cc-text-2: #f0e0c8;
+  --cc-text-3: #b39a72;
+  --cc-text-4: #7d6a4d;
+  --cc-untyped: #574833;
+
+  --cc-error: #ff5f56;
+  --cc-error-rgb: 255, 95, 86;
+  --cc-success: #4ade80;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Nebula — Deep violet with orchid ─────────────── */
+:root[data-theme="nebula"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #0a0714;
+  --cc-bg-2: #0e0a1b;
+  --cc-surface: #130d22;
+  --cc-surface-rgb: 19, 13, 34;
+  --cc-overlay: #1b1330;
+  --cc-elevated: #221840;
+  --cc-border: #2f2150;
+  --cc-border-strong: #433070;
+
+  --cc-accent: #c084fc;
+  --cc-accent-rgb: 192, 132, 252;
+  --cc-accent-bright: #d8b4fe;
+  --cc-accent-bright-rgb: 216, 180, 254;
+  --cc-accent-dim: #9333ea;
+  --cc-on-accent: #10061f;
+
+  --cc-text: #f5f0ff;
+  --cc-text-2: #ddd2f5;
+  --cc-text-3: #9d8fc0;
+  --cc-text-4: #6b5f8c;
+  --cc-untyped: #584e73;
+
+  --cc-error: #ff6b81;
+  --cc-error-rgb: 255, 107, 129;
+  --cc-success: #4ade80;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Lagoon — Abyssal teal with turquoise ─────────── */
+:root[data-theme="lagoon"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #04131a;
+  --cc-bg-2: #061a22;
+  --cc-surface: #08222c;
+  --cc-surface-rgb: 8, 34, 44;
+  --cc-overlay: #0c2d39;
+  --cc-elevated: #0f3746;
+  --cc-border: #17495a;
+  --cc-border-strong: #216478;
+
+  --cc-accent: #2dd4bf;
+  --cc-accent-rgb: 45, 212, 191;
+  --cc-accent-bright: #5eead4;
+  --cc-accent-bright-rgb: 94, 234, 212;
+  --cc-accent-dim: #0d9488;
+  --cc-on-accent: #02191c;
+
+  --cc-text: #e8fbf8;
+  --cc-text-2: #c2ece6;
+  --cc-text-3: #7fb0a9;
+  --cc-text-4: #568680;
+  --cc-untyped: #33605d;
+
+  --cc-error: #ff6b6b;
+  --cc-error-rgb: 255, 107, 107;
+  --cc-success: #34d399;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Ember — Warm charcoal with burnt orange ──────── */
+:root[data-theme="ember"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #120e0a;
+  --cc-bg-2: #181310;
+  --cc-surface: #1f1813;
+  --cc-surface-rgb: 31, 24, 19;
+  --cc-overlay: #2a201a;
+  --cc-elevated: #332720;
+  --cc-border: #46362b;
+  --cc-border-strong: #5f4a3a;
+
+  --cc-accent: #fb923c;
+  --cc-accent-rgb: 251, 146, 60;
+  --cc-accent-bright: #fdba74;
+  --cc-accent-bright-rgb: 253, 186, 116;
+  --cc-accent-dim: #ea580c;
+  --cc-on-accent: #1a0d03;
+
+  --cc-text: #fff4ec;
+  --cc-text-2: #f2ddcd;
+  --cc-text-3: #b8947c;
+  --cc-text-4: #856a58;
+  --cc-untyped: #5e4b3e;
+
+  --cc-error: #f43f5e;
+  --cc-error-rgb: 244, 63, 94;
+  --cc-success: #4ade80;
+  --cc-warning: #fcd34d;
+}
+
+/* ── Fuchsia — Ink black with hot pink ────────────── */
+:root[data-theme="fuchsia"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #0f0810;
+  --cc-bg-2: #150c17;
+  --cc-surface: #1c111f;
+  --cc-surface-rgb: 28, 17, 31;
+  --cc-overlay: #26172a;
+  --cc-elevated: #301d35;
+  --cc-border: #432a49;
+  --cc-border-strong: #5d3b64;
+
+  --cc-accent: #f472b6;
+  --cc-accent-rgb: 244, 114, 182;
+  --cc-accent-bright: #f9a8d4;
+  --cc-accent-bright-rgb: 249, 168, 212;
+  --cc-accent-dim: #db2777;
+  --cc-on-accent: #1a0512;
+
+  --cc-text: #fdf2fa;
+  --cc-text-2: #f0d8e8;
+  --cc-text-3: #bb92b0;
+  --cc-text-4: #8a6a82;
+  --cc-untyped: #634f5d;
+
+  --cc-error: #dc2626;
+  --cc-error-rgb: 220, 38, 38;
+  --cc-success: #4ade80;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Graphite — Monochrome slate with platinum ────── */
+:root[data-theme="graphite"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #0e0e10;
+  --cc-bg-2: #131316;
+  --cc-surface: #191a1d;
+  --cc-surface-rgb: 25, 26, 29;
+  --cc-overlay: #212225;
+  --cc-elevated: #2a2b2f;
+  --cc-border: #3a3b40;
+  --cc-border-strong: #4f5157;
+
+  --cc-accent: #d4d4d8;
+  --cc-accent-rgb: 212, 212, 216;
+  --cc-accent-bright: #f4f4f5;
+  --cc-accent-bright-rgb: 244, 244, 245;
+  --cc-accent-dim: #a1a1aa;
+  --cc-on-accent: #111113;
+
+  --cc-text: #fafafa;
+  --cc-text-2: #e0e0e2;
+  --cc-text-3: #9b9ba1;
+  --cc-text-4: #6e6e75;
+  --cc-untyped: #4f4f56;
+
+  --cc-error: #f87171;
+  --cc-error-rgb: 248, 113, 113;
+  --cc-success: #4ade80;
+  --cc-warning: #fbbf24;
+}
+
+/* ── Steel — Arctic slate with frost blue ─────────── */
+:root[data-theme="steel"] {
+  color-scheme: dark;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 255, 255, 255;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: invert(1);
+  --cc-logo-blend: screen;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 0, 0, 0;
+  --cc-shadow-strength: 1;
+
+  --cc-bg: #20242e;
+  --cc-bg-2: #252a35;
+  --cc-surface: #2b313d;
+  --cc-surface-rgb: 43, 49, 61;
+  --cc-overlay: #343b49;
+  --cc-elevated: #3d4553;
+  --cc-border: #4a5364;
+  --cc-border-strong: #5e6a7e;
+
+  --cc-accent: #88c0d0;
+  --cc-accent-rgb: 136, 192, 208;
+  --cc-accent-bright: #a9d5e2;
+  --cc-accent-bright-rgb: 169, 213, 226;
+  --cc-accent-dim: #5e9aad;
+  --cc-on-accent: #0f1720;
+
+  --cc-text: #eceff4;
+  --cc-text-2: #d8dee9;
+  --cc-text-3: #a3adbd;
+  --cc-text-4: #7d879a;
+  --cc-untyped: #5c6678;
+
+  --cc-error: #f2777a;
+  --cc-error-rgb: 242, 119, 122;
+  --cc-success: #a3be8c;
+  --cc-warning: #ebcb8b;
+}
+
+/* ── Daylight — Clean white with a cobalt accent ──── */
+:root[data-theme="daylight"] {
+  color-scheme: light;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 0, 0, 0;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: none;
+  --cc-logo-blend: multiply;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 15, 23, 42;
+  --cc-shadow-strength: 0.3;
+
+  --cc-bg: #ffffff;
+  --cc-bg-2: #fafbfc;
+  --cc-surface: #f4f6f8;
+  --cc-surface-rgb: 244, 246, 248;
+  --cc-overlay: #eaeef2;
+  --cc-elevated: #e1e6ec;
+  --cc-border: #d5dce4;
+  --cc-border-strong: #b4bfcc;
+
+  --cc-accent: #2563eb;
+  --cc-accent-rgb: 37, 99, 235;
+  --cc-accent-bright: #1d4ed8;
+  --cc-accent-bright-rgb: 29, 78, 216;
+  --cc-accent-dim: #1e40af;
+  --cc-on-accent: #ffffff;
+
+  --cc-text: #0f172a;
+  --cc-text-2: #243043;
+  --cc-text-3: #566072;
+  --cc-text-4: #7b8697;
+  --cc-untyped: #9ba1ab;
+
+  --cc-error: #dc2626;
+  --cc-error-rgb: 220, 38, 38;
+  --cc-success: #15803d;
+  --cc-warning: #b45309;
+}
+
+/* ── Parchment — Warm cream with sepia ink ────────── */
+:root[data-theme="parchment"] {
+  color-scheme: light;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 0, 0, 0;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: none;
+  --cc-logo-blend: multiply;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 15, 23, 42;
+  --cc-shadow-strength: 0.3;
+
+  --cc-bg: #fdf8ee;
+  --cc-bg-2: #faf3e4;
+  --cc-surface: #f5ecd9;
+  --cc-surface-rgb: 245, 236, 217;
+  --cc-overlay: #eee2c8;
+  --cc-elevated: #e6d8b8;
+  --cc-border: #dbc9a3;
+  --cc-border-strong: #bfa87c;
+
+  --cc-accent: #a16207;
+  --cc-accent-rgb: 161, 98, 7;
+  --cc-accent-bright: #854d0e;
+  --cc-accent-bright-rgb: 133, 77, 14;
+  --cc-accent-dim: #713f12;
+  --cc-on-accent: #fffbf2;
+
+  --cc-text: #2e2417;
+  --cc-text-2: #453724;
+  --cc-text-3: #6b5942;
+  --cc-text-4: #8a765c;
+  --cc-untyped: #a99a7f;
+
+  --cc-error: #b91c1c;
+  --cc-error-rgb: 185, 28, 28;
+  --cc-success: #15803d;
+  --cc-warning: #a16207;
+}
+
+/* ── Sage — Soft eucalyptus with forest green ─────── */
+:root[data-theme="sage"] {
+  color-scheme: light;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 0, 0, 0;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: none;
+  --cc-logo-blend: multiply;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 15, 23, 42;
+  --cc-shadow-strength: 0.3;
+
+  --cc-bg: #f5f9f5;
+  --cc-bg-2: #eef4ee;
+  --cc-surface: #e7efe7;
+  --cc-surface-rgb: 231, 239, 231;
+  --cc-overlay: #dde8dd;
+  --cc-elevated: #d2e0d2;
+  --cc-border: #c2d4c2;
+  --cc-border-strong: #9db69d;
+
+  --cc-accent: #15803d;
+  --cc-accent-rgb: 21, 128, 61;
+  --cc-accent-bright: #166534;
+  --cc-accent-bright-rgb: 22, 101, 52;
+  --cc-accent-dim: #14532d;
+  --cc-on-accent: #f6fbf6;
+
+  --cc-text: #14251a;
+  --cc-text-2: #26392c;
+  --cc-text-3: #4f6455;
+  --cc-text-4: #71887a;
+  --cc-untyped: #909f93;
+
+  --cc-error: #b91c1c;
+  --cc-error-rgb: 185, 28, 28;
+  --cc-success: #15803d;
+  --cc-warning: #a16207;
+}
+
+/* ── Porcelain — Cool porcelain with indigo ───────── */
+:root[data-theme="porcelain"] {
+  color-scheme: light;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 0, 0, 0;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: none;
+  --cc-logo-blend: multiply;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 15, 23, 42;
+  --cc-shadow-strength: 0.3;
+
+  --cc-bg: #f8fafc;
+  --cc-bg-2: #f1f5f9;
+  --cc-surface: #e9eef5;
+  --cc-surface-rgb: 233, 238, 245;
+  --cc-overlay: #dfe6f0;
+  --cc-elevated: #d3dcea;
+  --cc-border: #c5d0e0;
+  --cc-border-strong: #a3b2c8;
+
+  --cc-accent: #4f46e5;
+  --cc-accent-rgb: 79, 70, 229;
+  --cc-accent-bright: #4338ca;
+  --cc-accent-bright-rgb: 67, 56, 202;
+  --cc-accent-dim: #3730a3;
+  --cc-on-accent: #ffffff;
+
+  --cc-text: #111827;
+  --cc-text-2: #26324a;
+  --cc-text-3: #525f78;
+  --cc-text-4: #77839b;
+  --cc-untyped: #959eae;
+
+  --cc-error: #dc2626;
+  --cc-error-rgb: 220, 38, 38;
+  --cc-success: #15803d;
+  --cc-warning: #b45309;
+}
+
+/* ── Blush — Pale rose with deep plum ─────────────── */
+:root[data-theme="blush"] {
+  color-scheme: light;
+  /* Overlays lift on dark palettes and deepen on light ones. */
+  --cc-tint-rgb: 0, 0, 0;
+  /* The wordmark art is dark-on-white. Dark UIs invert it and screen
+     away the black; light UIs keep it and multiply away the white. */
+  --cc-logo-filter: none;
+  --cc-logo-blend: multiply;
+  /* Drop shadows: near-black and full strength on dark palettes, a
+     soft cool tint at ~a third the alpha on light ones, where a heavy
+     black shadow reads as a smudge. */
+  --cc-shadow-rgb: 15, 23, 42;
+  --cc-shadow-strength: 0.3;
+
+  --cc-bg: #fdf7f8;
+  --cc-bg-2: #fbeff1;
+  --cc-surface: #f7e6ea;
+  --cc-surface-rgb: 247, 230, 234;
+  --cc-overlay: #f0dae0;
+  --cc-elevated: #e8ccd4;
+  --cc-border: #dfbcc6;
+  --cc-border-strong: #c3949f;
+
+  --cc-accent: #86198f;
+  --cc-accent-rgb: 134, 25, 143;
+  --cc-accent-bright: #701a75;
+  --cc-accent-bright-rgb: 112, 26, 117;
+  --cc-accent-dim: #581c87;
+  --cc-on-accent: #fdf4ff;
+
+  --cc-text: #2b1119;
+  --cc-text-2: #43222b;
+  --cc-text-3: #6d4650;
+  --cc-text-4: #8e6670;
+  --cc-untyped: #c9a3ad;
+
+  --cc-error: #b91c1c;
+  --cc-error-rgb: 185, 28, 28;
+  --cc-success: #15803d;
+  --cc-warning: #a16207;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Bridge — map the app's existing token names onto the palette.
+
+   Unlayered, so it wins over the @layer theme block Tailwind emits
+   from @theme. Everything in the JSX already reads these via
+   bg-[var(--color-…)] and friends, so the whole React tree themes
+   itself from here with no component changes.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --color-surface: var(--cc-bg);
+  --color-surface-raised: var(--cc-surface);
+  --color-surface-overlay: var(--cc-overlay);
+  --color-border: var(--cc-border);
+  --color-accent: var(--cc-accent);
+  --color-accent-glow: rgba(var(--cc-accent-rgb), 0.45);
+  --color-accent-rgb: var(--cc-accent-rgb);
+  --color-on-accent: var(--cc-on-accent);
+  --color-error: var(--cc-error);
+  --color-untyped: var(--cc-untyped);
+  --color-text-primary: var(--cc-text);
+  --color-text-secondary: var(--cc-text-3);
+  --color-success: var(--cc-success);
+  --color-warning: var(--cc-warning);
+  --color-f1-red: var(--cc-accent);
+  --color-f1-white: var(--cc-text);
+}

@@ -1,0 +1,50 @@
+# CodeCaret CI — runs on every push and pull request.
+#   client: lint, unit tests (Vitest), production build, dependency audit
+#   server: syntax check of every module, unit tests (node:test),
+#           dependency audit
+# The audits fail the build on a high or critical advisory in a
+# package that ships (devDependencies are left out).
+# The server's smoke test (npm run smoke) needs a running API with
+# MongoDB and Redis, so it stays a local check rather than running here.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high
+
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - name: Syntax check
+        run: find . -name "*.js" -not -path "./node_modules/*" -print0 | xargs -0 -n1 node --check
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high

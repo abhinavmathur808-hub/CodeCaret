@@ -1,0 +1,182 @@
+[
+  {
+    "id": "carbon",
+    "label": "Carbon",
+    "blurb": "F1 livery — black & racing red",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#0a0a0a",
+      "surface": "#1e1e1e",
+      "accent": "#e10600",
+      "text": "#ffffff"
+    }
+  },
+  {
+    "id": "midnight",
+    "label": "Midnight",
+    "blurb": "Deep navy with a sky-blue accent",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#060910",
+      "surface": "#16203a",
+      "accent": "#38bdf8",
+      "text": "#f0f6ff"
+    }
+  },
+  {
+    "id": "verdant",
+    "label": "Verdant",
+    "blurb": "Forest black with emerald",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#05100b",
+      "surface": "#142c20",
+      "accent": "#34d399",
+      "text": "#eefaf3"
+    }
+  },
+  {
+    "id": "solar",
+    "label": "Solar",
+    "blurb": "Warm espresso with amber",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#100b04",
+      "surface": "#2d2112",
+      "accent": "#fbbf24",
+      "text": "#fff7ea"
+    }
+  },
+  {
+    "id": "nebula",
+    "label": "Nebula",
+    "blurb": "Deep violet with orchid",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#0a0714",
+      "surface": "#221840",
+      "accent": "#c084fc",
+      "text": "#f5f0ff"
+    }
+  },
+  {
+    "id": "lagoon",
+    "label": "Lagoon",
+    "blurb": "Abyssal teal with turquoise",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#04131a",
+      "surface": "#0f3746",
+      "accent": "#2dd4bf",
+      "text": "#e8fbf8"
+    }
+  },
+  {
+    "id": "ember",
+    "label": "Ember",
+    "blurb": "Warm charcoal with burnt orange",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#120e0a",
+      "surface": "#332720",
+      "accent": "#fb923c",
+      "text": "#fff4ec"
+    }
+  },
+  {
+    "id": "fuchsia",
+    "label": "Fuchsia",
+    "blurb": "Ink black with hot pink",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#0f0810",
+      "surface": "#301d35",
+      "accent": "#f472b6",
+      "text": "#fdf2fa"
+    }
+  },
+  {
+    "id": "graphite",
+    "label": "Graphite",
+    "blurb": "Monochrome slate with platinum",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#0e0e10",
+      "surface": "#2a2b2f",
+      "accent": "#d4d4d8",
+      "text": "#fafafa"
+    }
+  },
+  {
+    "id": "steel",
+    "label": "Steel",
+    "blurb": "Arctic slate with frost blue",
+    "scheme": "dark",
+    "swatch": {
+      "bg": "#20242e",
+      "surface": "#3d4553",
+      "accent": "#88c0d0",
+      "text": "#eceff4"
+    }
+  },
+  {
+    "id": "daylight",
+    "label": "Daylight",
+    "blurb": "Clean white with a cobalt accent",
+    "scheme": "light",
+    "swatch": {
+      "bg": "#ffffff",
+      "surface": "#e1e6ec",
+      "accent": "#2563eb",
+      "text": "#0f172a"
+    }
+  },
+  {
+    "id": "parchment",
+    "label": "Parchment",
+    "blurb": "Warm cream with sepia ink",
+    "scheme": "light",
+    "swatch": {
+      "bg": "#fdf8ee",
+      "surface": "#e6d8b8",
+      "accent": "#a16207",
+      "text": "#2e2417"
+    }
+  },
+  {
+    "id": "sage",
+    "label": "Sage",
+    "blurb": "Soft eucalyptus with forest green",
+    "scheme": "light",
+    "swatch": {
+      "bg": "#f5f9f5",
+      "surface": "#d2e0d2",
+      "accent": "#15803d",
+      "text": "#14251a"
+    }
+  },
+  {
+    "id": "porcelain",
+    "label": "Porcelain",
+    "blurb": "Cool porcelain with indigo",
+    "scheme": "light",
+    "swatch": {
+      "bg": "#f8fafc",
+      "surface": "#d3dcea",
+      "accent": "#4f46e5",
+      "text": "#111827"
+    }
+  },
+  {
+    "id": "blush",
+    "label": "Blush",
+    "blurb": "Pale rose with deep plum",
+    "scheme": "light",
+    "swatch": {
+      "bg": "#fdf7f8",
+      "surface": "#e8ccd4",
+      "accent": "#86198f",
+      "text": "#2b1119"
+    }
+  }
+]

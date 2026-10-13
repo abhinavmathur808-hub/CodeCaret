@@ -1,0 +1,5 @@
+# CodeCaret — public pages may be indexed; account pages are private.
+User-agent: *
+Disallow: /profile
+Disallow: /reset-password
+Disallow: /forgot-password

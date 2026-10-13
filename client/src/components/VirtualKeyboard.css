@@ -1,0 +1,309 @@
+/* ═══════════════════════════════════════════════════════════════
+   VirtualKeyboard.css — F1 Dark Cockpit Theme
+   ─────────────────────────────────────────────────────────────
+   Dark mechanical keyboard matching the F1 telemetry dashboard.
+   Feedback glows for correct / wrong / expected.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Container — fully transparent ───────────────────────── */
+.vk-container {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  user-select: none;
+  font-family: var(--global-font, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+}
+
+/* ── Row layout ──────────────────────────────────────────── */
+.vk-row {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin-bottom: 3px;
+}
+
+.vk-row:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Individual keycap — ultra-flat ──────────────────────── */
+.vk-key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 38px;
+  padding: 0 6px;
+  background-color: var(--cc-overlay);
+  border: 1px solid var(--cc-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(var(--cc-shadow-rgb), calc(0.3 * var(--cc-shadow-strength)));
+  color: var(--cc-text);
+  font-family: inherit;
+  font-size: calc(0.68rem * var(--vk-scale, 1));
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  cursor: default;
+  flex: 0 0 40px;
+  transition:
+    background-color 0.1s ease,
+    color 0.1s ease,
+    border-color 0.1s ease,
+    box-shadow 0.12s ease,
+    transform 0.1s ease;
+}
+
+/* ── Alpha keys — lowercase by default, high legibility ──── */
+.vk-key-alpha {
+  text-transform: lowercase;
+  font-size: calc(1.1rem * var(--vk-scale, 1));
+  font-weight: 400;
+}
+
+/* ── Keys with shift labels — stacked layout ─────────────── */
+.vk-key:has(.vk-shift-label) {
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px 6px;
+}
+
+.vk-shift-label {
+  font-size: calc(0.55rem * var(--vk-scale, 1));
+  color: var(--cc-text-3);
+  line-height: 1;
+}
+
+.vk-primary-label {
+  font-size: calc(0.68rem * var(--vk-scale, 1));
+  line-height: 1;
+}
+
+/* ── Hover — barely-there tint ───────────────────────────── */
+.vk-key:hover {
+  background-color: var(--cc-overlay);
+  border-color: var(--cc-untyped);
+}
+
+/* ── Pressed — flat scale-down ───────────────────────────── */
+.vk-key.pressed {
+  background-color: var(--cc-surface);
+  box-shadow: none;
+  transform: scale(0.96);
+}
+
+/* ── Expected next key — blue highlight ──────────────────── */
+.vk-key.expected {
+  background-color: var(--cc-accent) !important;
+  color: var(--cc-on-accent) !important;
+  border-color: var(--cc-accent-bright) !important;
+  box-shadow: 0 0 15px rgba(var(--cc-accent-rgb), 0.5) !important;
+  transform: none !important;
+}
+
+/* ── Feedback: Correct keystroke ─────────────────────────── */
+.vk-key[data-feedback="correct"] {
+  background-color: var(--cc-success) !important;
+  /* success is a light green in every palette — dark text on it */
+  color: #04140d !important;
+  border-color: var(--cc-success) !important;
+  box-shadow: 0 0 15px rgba(var(--cc-accent-rgb), 0.35) !important;
+  transform: none !important;
+  transition:
+    background-color 0.06s ease,
+    box-shadow 0.06s ease;
+}
+
+/* ── Feedback: Wrong keystroke ───────────────────────────── */
+.vk-key[data-feedback="wrong"] {
+  /* Error red in every palette — a mistyped key must never take on
+     the theme accent, or it stops reading as a mistake. */
+  background-color: var(--cc-error) !important;
+  color: var(--cc-text) !important;
+  border-color: var(--cc-error) !important;
+  box-shadow: 0 0 15px rgba(var(--cc-error-rgb), 0.5) !important;
+  animation: vk-shake 0.28s ease-in-out;
+  transition:
+    background-color 0.06s ease,
+    box-shadow 0.06s ease;
+}
+
+/* ── Shake animation ─────────────────────────────────────── */
+@keyframes vk-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-3px); }
+  40%  { transform: translateX(3px); }
+  60%  { transform: translateX(-2px); }
+  80%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Width variants — flush ANSI proportions ─────────────────
+   All rows total exactly the same width for a perfect rectangle.
+   Base: 40px key · 3px gap
+   Row 0: 13×40 + 86 + 13×3  = 645px  (14 keys, 13 gaps)
+   Row 1: 63 + 12×40 + 63 + 13×3  = 645px
+   Row 2: 76 + 11×40 + 93 + 12×3  = 645px
+   Row 3: 99 + 10×40 + 113 + 11×3 = 645px
+   Row 4: 2×54 + 50 + 2×50 + 45 + Space + 6×3 = 645px → Space=324
+   ─────────────────────────────────────────────────────────── */
+.vk-key--backspace   { min-width: 86px;  flex: 0 0 86px;  }
+.vk-key--tab         { min-width: 63px;  flex: 0 0 63px;  }
+.vk-key--backslash   { min-width: 63px;  flex: 0 0 63px;  }
+.vk-key--caps        { min-width: 76px;  flex: 0 0 76px;  }
+.vk-key--enter       { min-width: 93px;  flex: 0 0 93px;  }
+.vk-key--shift-l     { min-width: 99px;  flex: 0 0 99px;  }
+.vk-key--shift-r     { min-width: 113px; flex: 0 0 113px; }
+.vk-key--ctrl        { min-width: 54px;  flex: 0 0 54px;  }
+.vk-key--alt         { min-width: 50px;  flex: 0 0 50px;  }
+.vk-key--meta        { min-width: 50px;  flex: 0 0 50px;  }
+.vk-key--space       { min-width: 324px; flex: 0 0 324px; }
+.vk-key--fn          { min-width: 45px;  flex: 0 0 45px;  }
+
+/* ── Modifier keys — sleek, engineered look ──────────────── */
+.vk-key--modifier {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background-color: var(--cc-surface);
+  color: var(--cc-text-3);
+  font-size: calc(0.7rem * var(--vk-scale, 1));
+  font-weight: 600;
+  /* Word labels ("Caps Lock") are the tightest fit on the keyboard.
+     The system stack they used to be locked to is narrower than most
+     monospace faces, so the tracking and side padding are trimmed to
+     buy headroom now that any face can land here. */
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  padding: 0 8px !important;
+}
+
+/* ── Per-face keycap scaling ──────────────────────────────────
+   The typing fonts span 0.4em to 0.875em of set width, so a single
+   font-size makes VT323 look tiny and Silkscreen look cramped on a
+   fixed 40x38 keycap. --vk-scale normalises each face to the ~0.6em
+   reference (Fira Code); the ratios are 0.6 / measured set width.
+   Faces within ~10% of the reference are left alone. */
+.light-typing-sandbox[data-font="Pixel"]       { --vk-scale: 1.50; } /* VT323        0.400em */
+.light-typing-sandbox[data-font="Inconsolata"] { --vk-scale: 1.20; } /* Inconsolata  0.500em */
+.light-typing-sandbox[data-font="ShareTech"]   { --vk-scale: 1.11; } /* Share Tech   0.540em */
+.light-typing-sandbox[data-font="Syne"]        { --vk-scale: 1.09; } /* Syne Mono    0.550em */
+.light-typing-sandbox[data-font="Vintage"]     { --vk-scale: 0.86; } /* Special Elite 0.698em */
+.light-typing-sandbox[data-font="Martian"]     { --vk-scale: 0.86; } /* Martian Mono 0.700em */
+.light-typing-sandbox[data-font="Handwritten"] { --vk-scale: 0.73; } /* Architects   0.827em */
+.light-typing-sandbox[data-font="Bitmap"]      { --vk-scale: 0.69; } /* Silkscreen   0.875em */
+
+.vk-key--modifier:hover {
+  background-color: var(--cc-overlay);
+  color: var(--cc-text-2);
+}
+
+.vk-key--modifier.pressed {
+  background-color: var(--cc-surface);
+  color: var(--cc-text-2);
+  box-shadow: none;
+  transform: scale(0.96);
+}
+
+/* ── Modifier label text ─────────────────────────────────── */
+.vk-modifier-text {
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+/* ── Modifier icon — SVG rendering ───────────────────────── */
+.vk-modifier-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+.vk-modifier-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: transparent;
+}
+
+/* ── CapsLock key — room for indicator dot ──────────────── */
+.vk-key[data-code="CapsLock"] {
+  padding-left: 8px;
+  padding-right: 14px;
+  justify-content: flex-start;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   Caps Lock — indicator light + uppercase alpha keys
+   ═════════════════════════════════════════════════════════════════ */
+
+/* Indicator dot (off) */
+.vk-key[data-code="CapsLock"]::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--cc-border-strong);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Indicator dot (on — sky blue) */
+.vk-container.caps-active .vk-key[data-code="CapsLock"]::after {
+  background-color: var(--cc-accent);
+  box-shadow: 0 0 8px var(--cc-accent);
+}
+
+/* Uppercase transform for alpha keys when Caps is active */
+.vk-container.caps-active .vk-key-alpha {
+  text-transform: uppercase;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .vk-container {
+    max-width: 100%;
+  }
+
+  .vk-key {
+    min-width: 26px;
+    height: 30px;
+    font-size: 0.48rem;
+    padding: 0 3px;
+    border-radius: 4px;
+    flex: 0 0 26px;
+  }
+
+  .vk-shift-label {
+    font-size: 0.42rem;
+  }
+
+  .vk-primary-label {
+    font-size: 0.48rem;
+  }
+
+  .vk-row {
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
+  .vk-key--backspace   { min-width: 56px;  flex: 0 0 56px;  }
+  .vk-key--tab         { min-width: 41px;  flex: 0 0 41px;  }
+  .vk-key--backslash   { min-width: 41px;  flex: 0 0 41px;  }
+  .vk-key--caps        { min-width: 49px;  flex: 0 0 49px;  }
+  .vk-key--enter       { min-width: 61px;  flex: 0 0 61px;  }
+  .vk-key--shift-l     { min-width: 64px;  flex: 0 0 64px;  }
+  .vk-key--shift-r     { min-width: 74px;  flex: 0 0 74px;  }
+  .vk-key--ctrl        { min-width: 35px;  flex: 0 0 35px;  }
+  .vk-key--alt         { min-width: 33px;  flex: 0 0 33px;  }
+  .vk-key--meta        { min-width: 33px;  flex: 0 0 33px;  }
+  .vk-key--space       { min-width: 212px; flex: 0 0 212px; }
+  .vk-key--fn          { min-width: 29px;  flex: 0 0 29px;  }
+}

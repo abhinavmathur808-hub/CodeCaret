@@ -1,0 +1,1922 @@
+/* ═══════════════════════════════════════════════════════════════
+   LandingPage.css — the home page's HTML layers.
+
+   Stacking, back to front:
+     .lp-stage     the WebGL circuit (or a static poster)      z 0
+     .lp-sections  one copy card per stretch of the lap         z 2
+     .lp-hud       lights, telemetry, minimap, radio, nav       z 3
+     .lp-loader    lights-sequence loading screen               z 10
+   All four are fixed to the viewport; only .lp-spacer scrolls.
+
+   Type, as everywhere on the site: Saira (--font-display) for the
+   titles, chips, badges and HUD labels; the logo's own lettering
+   (Kaushan Script, --font-brand) for navigation, the buttons and
+   the eyebrow line over a title; Inter for running text; monospace
+   only for live numbers.
+
+   The page is a night circuit whatever the theme, so it carries
+   its own dark palette. Only the accent follows the visitor's theme
+   (LandingPage.jsx writes --lp-accent from --cc-accent).
+   ═══════════════════════════════════════════════════════════════ */
+
+.lp-root {
+  --lp-bg: #040508;
+  --lp-text: #f6f7f9;
+  --lp-body: #e4e7ee; /* running text on a card: ~14:1 */
+  --lp-muted: rgba(230, 234, 242, 0.8);
+  --lp-faint: rgba(230, 234, 242, 0.58);
+  --lp-card: rgba(9, 10, 14, 0.86);
+  --lp-card-line: rgba(255, 255, 255, 0.1);
+  --lp-accent: #e10600;
+  --lp-accent-rgb: 225, 6, 0;
+  /* The accent as TEXT: lifted toward white so a red phrase on a dark
+     card still clears 4.5:1 (pure racing red on near-black does not). */
+  --lp-hi: color-mix(in srgb, var(--lp-accent) 72%, #ffffff);
+  --lp-red: #ff2a1f;
+  --lp-green: #1fe36a;
+  --lp-amber: #ffb400;
+  --lp-purple: #b46cff;
+  --lp-brand: var(--font-brand, "Kaushan Script", "Segoe Script", cursive);
+  --lp-display: var(--font-display, "Saira", "Segoe UI", sans-serif);
+  --lp-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --lp-mono: "JetBrains Mono", "Fira Code", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  position: relative;
+  color: var(--lp-text);
+  background: var(--lp-bg);
+  font-family: var(--lp-sans);
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lp-spacer {
+  height: calc(var(--lp-screens, 11) * 100vh);
+}
+
+/* ── Stage ─────────────────────────────────────────────────── */
+.lp-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--lp-bg);
+}
+
+.lp-stage canvas {
+  display: block;
+  touch-action: pan-y;
+}
+
+/* No WebGL: a still of the same night — horizon glow, grid floor. */
+.lp-poster {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 60% at 50% 100%, rgba(var(--lp-accent-rgb), 0.22), transparent 60%),
+    radial-gradient(80% 40% at 50% 62%, rgba(255, 170, 110, 0.08), transparent 70%),
+    linear-gradient(180deg, #05060b 0%, #0a0c15 55%, #120a0e 100%);
+}
+
+.lp-poster::after {
+  content: "";
+  position: absolute;
+  inset: 55% -20% -10%;
+  background-image:
+    linear-gradient(rgba(var(--lp-accent-rgb), 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--lp-accent-rgb), 0.35) 1px, transparent 1px);
+  background-size: 64px 64px;
+  transform: perspective(420px) rotateX(62deg);
+  transform-origin: 50% 0;
+  mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+}
+
+/* ── Copy panels ───────────────────────────────────────────── */
+.lp-sections {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lp-sec {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 96px clamp(20px, 6vw, 104px) 120px;
+}
+
+.lp-sec[data-shown="0"] {
+  visibility: hidden;
+}
+
+.lp-sec-right {
+  justify-content: flex-end;
+}
+
+/* Feature cards ride high, clear of the dash (bottom left) and the
+   minimap (bottom right) whichever side they are on. Phones keep
+   their bottom sheet (see the max-width: 760px block). */
+@media (min-width: 761px) {
+  .lp-sec:not(.lp-sec-hero):not(.lp-sec-finale) {
+    align-items: flex-start;
+    padding-top: 104px;
+  }
+}
+
+.lp-sec-center {
+  justify-content: center;
+  text-align: center;
+}
+
+/* The finale sits high: the car rolls to a stop beneath it. */
+.lp-sec-finale {
+  align-items: flex-start;
+  padding-top: max(96px, 11vh);
+}
+
+.lp-sec-inner {
+  position: relative;
+  width: min(520px, 100%);
+  pointer-events: auto;
+}
+
+.lp-sec-hero .lp-sec-inner {
+  width: min(560px, 100%);
+}
+
+.lp-sec-finale .lp-sec-inner {
+  width: min(660px, 100%);
+}
+
+/* The staggered reveal: --v is the panel's visibility, --i a child's
+   place in the cascade. Cards reveal, then their contents. */
+.lp-sec-inner > *,
+.lp-card > * {
+  --c: clamp(0, calc(var(--v, 0) * 1.75 - var(--i, 0) * 0.13), 1);
+  opacity: var(--c);
+  transform: translate3d(calc((1 - var(--c)) * -28px), 0, 0);
+}
+
+.lp-sec-right .lp-sec-inner > *,
+.lp-sec-right .lp-card > * {
+  transform: translate3d(calc((1 - var(--c)) * 28px), 0, 0);
+}
+
+.lp-sec-center .lp-sec-inner > *,
+.lp-sec-center .lp-card > * {
+  transform: translate3d(0, calc((1 - var(--c)) * 24px), 0);
+}
+
+/* Hero entrance on first paint, before any scrolling. */
+.lp-sec-hero .lp-sec-inner > * {
+  animation: lp-rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(0.35s + var(--i, 0) * 0.12s);
+}
+
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+    filter: blur(6px);
+  }
+}
+
+/* The card: solid glass, so the copy reads the same over whatever the
+   camera is looking at — red kerbs, floodlights, the dark city. */
+.lp-card {
+  position: relative;
+  padding: 24px 28px 28px;
+  border: 1px solid var(--lp-card-line);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 40%),
+    var(--lp-card);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+
+/* An accent rule down the card's leading edge. */
+.lp-card::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: -1px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--lp-accent);
+  box-shadow: 0 0 16px rgba(var(--lp-accent-rgb), 0.75);
+}
+
+.lp-sec-right .lp-card::before {
+  left: auto;
+  right: -1px;
+}
+
+.lp-sec-center .lp-card::before {
+  top: -1px;
+  bottom: auto;
+  left: 28%;
+  right: 28%;
+  width: auto;
+  height: 3px;
+}
+
+.lp-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.lp-kicker,
+.lp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--lp-brand);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--lp-text);
+}
+
+.lp-tag-finale {
+  margin-bottom: 10px;
+}
+
+.lp-kicker {
+  margin-bottom: 8px;
+  font-size: 19px;
+  color: var(--lp-muted);
+}
+
+.lp-kicker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lp-accent);
+  box-shadow: 0 0 12px rgba(var(--lp-accent-rgb), 0.9);
+}
+
+.lp-sector-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-family: var(--lp-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(var(--lp-accent-rgb), 0.95), rgba(var(--lp-accent-rgb), 0.72));
+  box-shadow: 0 0 18px rgba(var(--lp-accent-rgb), 0.45);
+}
+
+.lp-step {
+  margin-left: auto;
+  font-family: var(--lp-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lp-faint);
+}
+
+.lp-step i {
+  margin: 0 3px;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.lp-flag {
+  width: 20px;
+  height: 15px;
+  background: conic-gradient(#fff 25%, #111 0 50%, #fff 0 75%, #111 0) 0 0 / 7.5px 7.5px;
+  border-radius: 2px;
+}
+
+/* The logo, at the size of a title. */
+.lp-hero-logo {
+  margin: 0 0 18px -6px;
+  line-height: 0;
+}
+
+.lp-hero-logo-img {
+  width: min(470px, 74vw);
+  height: auto;
+  filter: invert(1) drop-shadow(0 10px 40px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 26px rgba(var(--lp-accent-rgb), 0.35)) !important;
+}
+
+.lp-hero-tagline {
+  margin: 0;
+  font-family: var(--lp-display);
+  font-size: clamp(28px, 2.6vw, 38px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.lp-title {
+  margin: 0;
+  font-family: var(--lp-display);
+  font-size: clamp(30px, 2.9vw, 44px);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.lp-title em {
+  display: block;
+  font-style: normal;
+  color: var(--lp-hi);
+}
+
+.lp-title-xl {
+  font-size: clamp(40px, 4.4vw, 66px);
+  line-height: 1.02;
+}
+
+.lp-body {
+  margin: 16px 0 0;
+  max-width: 36em;
+  font-family: var(--lp-sans);
+  font-size: clamp(15.5px, 1.15vw, 17.5px);
+  font-weight: 450;
+  line-height: 1.65;
+  color: var(--lp-body);
+  text-wrap: pretty;
+}
+
+.lp-sec-center .lp-body {
+  margin-inline: auto;
+}
+
+.lp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-chip {
+  padding: 5px 13px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-family: var(--lp-display);
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.lp-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 20px 0 0;
+}
+
+.lp-stat b {
+  font-family: var(--lp-display);
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.lp-stat span {
+  font-family: var(--lp-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--lp-hi);
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.lp-hero-actions,
+.lp-finale-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.lp-finale-actions {
+  justify-content: center;
+}
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: var(--lp-brand);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.lp-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.lp-btn-primary {
+  background: linear-gradient(180deg, rgba(var(--lp-accent-rgb), 1), rgba(var(--lp-accent-rgb), 0.82));
+  box-shadow:
+    0 10px 30px rgba(var(--lp-accent-rgb), 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.lp-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 40px rgba(var(--lp-accent-rgb), 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.lp-btn-primary span {
+  font-family: var(--lp-sans);
+  transition: transform 0.18s ease;
+}
+
+.lp-btn-primary:hover span {
+  transform: translateX(4px);
+}
+
+.lp-btn-ghost {
+  border-color: rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lp-btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.lp-btn-lg {
+  padding: 13px 30px 14px;
+  font-size: 23px;
+}
+
+.lp-finale-note {
+  margin: 18px 0 0;
+  font-family: var(--lp-brand);
+  font-size: 18px;
+  color: var(--lp-muted);
+}
+
+.lp-finale-note a {
+  color: var(--lp-hi);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.lp-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  font-family: var(--lp-display);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--lp-muted);
+}
+
+.lp-mouse {
+  position: relative;
+  width: 20px;
+  height: 31px;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 11px;
+}
+
+.lp-mouse i {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 6px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--lp-accent);
+  animation: lp-wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes lp-wheel {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+/* ── HUD ───────────────────────────────────────────────────── */
+.lp-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  font-family: var(--lp-display);
+}
+
+.lp-hud a,
+.lp-hud button {
+  pointer-events: auto;
+}
+
+.lp-topbar {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 84px;
+  padding: 0 clamp(16px, 2.6vw, 36px);
+  background: linear-gradient(180deg, rgba(3, 4, 7, 0.82), rgba(3, 4, 7, 0));
+}
+
+.lp-brand {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  text-decoration: none;
+  transition:
+    opacity 0.5s ease,
+    visibility 0s linear 0s;
+}
+
+/* On the grid the hero carries the big logo; the bar's copy waits. */
+.lp-hud[data-phase="grid"] .lp-brand {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
+.lp-brand-logo {
+  height: 58px;
+  width: auto;
+  transition: transform 0.2s ease;
+}
+
+.lp-brand:hover .lp-brand-logo {
+  transform: rotate(-2deg) scale(1.03);
+}
+
+/* The three lights. */
+.lp-lights {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translateX(-50%);
+  --lamp: var(--lp-red);
+}
+
+.lp-lights[data-state="green"] {
+  --lamp: var(--lp-green);
+}
+
+.lp-lights[data-state="amber"] {
+  --lamp: var(--lp-amber);
+}
+
+.lp-lights-pod {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #16171c, #0a0b0e);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.lp-light {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--lamp) 32%, color-mix(in srgb, var(--lamp) 55%, #000) 100%);
+  box-shadow:
+    0 0 10px var(--lamp),
+    0 0 26px color-mix(in srgb, var(--lamp) 60%, transparent);
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* A yellow flag waves: the amber lamps pulse. */
+.lp-lights[data-state="amber"] .lp-light {
+  animation: lp-yellow 1s ease-in-out infinite;
+}
+
+@keyframes lp-yellow {
+  50% {
+    box-shadow:
+      0 0 4px var(--lamp),
+      0 0 8px color-mix(in srgb, var(--lamp) 30%, transparent);
+    filter: brightness(0.62);
+  }
+}
+
+.lp-lights-label {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--lamp) 55%, #fff);
+  background: rgba(6, 7, 10, 0.72);
+  white-space: nowrap;
+}
+
+.lp-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.8vw, 26px);
+}
+
+.lp-nav-link {
+  font-family: var(--lp-brand);
+  font-size: 19px;
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+  transition: color 0.15s ease;
+}
+
+.lp-nav-link:hover,
+.lp-nav-link:focus-visible {
+  color: #fff;
+}
+
+.lp-nav-cta {
+  padding: 8px 18px 9px;
+  border-radius: 10px;
+  font-family: var(--lp-brand);
+  font-size: 19px;
+  line-height: 1.2;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(var(--lp-accent-rgb), 0.95);
+  box-shadow: 0 6px 22px rgba(var(--lp-accent-rgb), 0.35);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.lp-nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(var(--lp-accent-rgb), 0.5);
+}
+
+.lp-nav-link:focus-visible,
+.lp-nav-cta:focus-visible,
+.lp-brand:focus-visible,
+.lp-chapter:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Team radio. */
+.lp-radio {
+  position: absolute;
+  top: 100px;
+  left: clamp(16px, 2.6vw, 36px);
+  width: min(340px, 80vw);
+  padding: 11px 15px 13px;
+  border: 1px solid var(--lp-card-line);
+  border-left: 3px solid var(--lp-accent);
+  border-radius: 12px;
+  background: var(--lp-card);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translate3d(-12px, 0, 0);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.lp-radio[data-on="1"] {
+  opacity: 1;
+  transform: none;
+}
+
+.lp-radio-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--lp-muted);
+}
+
+.lp-radio-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lp-accent);
+  box-shadow: 0 0 10px var(--lp-accent);
+  animation: lp-blink 1s steps(2, start) infinite;
+}
+
+@keyframes lp-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.lp-radio-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 14px;
+  margin-left: auto;
+}
+
+.lp-radio-wave i {
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--lp-accent);
+  transform-origin: center;
+  animation: lp-wave 0.9s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.11s);
+}
+
+@keyframes lp-wave {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.lp-radio-text {
+  margin: 6px 0 0;
+  font-family: var(--lp-sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #fff;
+}
+
+/* ── Chapter rail ──────────────────────────────────────────── */
+.lp-chapters {
+  position: absolute;
+  top: 118px;
+  right: clamp(10px, 1.4vw, 20px);
+}
+
+.lp-chapters ol {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The line the stops hang on. */
+.lp-chapters ol::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  bottom: 13px;
+  right: 12px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.05));
+}
+
+.lp-chapter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  font-family: var(--lp-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Labels show on hover or focus, beside their stop, on a chip of
+   their own so they stay legible over the scene. */
+.lp-chapter-label {
+  padding: 2px 11px 3px;
+  border-radius: 8px;
+  white-space: nowrap;
+  background: rgba(8, 9, 13, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translate3d(6px, 0, 0);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+  pointer-events: none;
+}
+
+.lp-chapter:hover .lp-chapter-label,
+.lp-chapter:focus-visible .lp-chapter-label {
+  opacity: 1;
+  transform: none;
+}
+
+.lp-chapter-dot {
+  position: relative;
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  background: rgba(6, 7, 10, 0.8);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.lp-chapter:hover .lp-chapter-dot {
+  transform: scale(1.25);
+  border-color: #fff;
+}
+
+.lp-chapter[data-state="done"] .lp-chapter-dot {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.lp-chapter[data-state="live"] .lp-chapter-dot {
+  transform: scale(1.35);
+  border-color: #fff;
+  background: var(--lp-accent);
+  box-shadow: 0 0 14px rgba(var(--lp-accent-rgb), 0.9);
+}
+
+/* ── Steering-wheel display ────────────────────────────────── */
+/* Hidden while the car sits on the grid; up as soon as it rolls. */
+.lp-dash,
+.lp-map {
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lp-hud[data-phase="grid"] .lp-dash,
+.lp-hud[data-phase="grid"] .lp-map {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+.lp-dash {
+  position: absolute;
+  bottom: 26px;
+  left: clamp(16px, 2.6vw, 36px);
+  width: 288px;
+  padding: 12px 16px 13px;
+  border: 1px solid var(--lp-card-line);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 15, 20, 0.9), rgba(6, 7, 10, 0.9));
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.lp-shift {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 4px;
+}
+
+.lp-shift i {
+  --lit: clamp(0, calc((var(--on, 0) - var(--i)) * 100), 1);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--lp-green);
+  opacity: calc(0.14 + var(--lit) * 0.86);
+  box-shadow: 0 0 calc(var(--lit) * 8px) currentColor;
+  color: var(--lp-green);
+}
+
+.lp-shift i:nth-child(n + 6) {
+  background: var(--lp-red);
+  color: var(--lp-red);
+}
+
+.lp-shift i:nth-child(n + 11) {
+  background: var(--lp-purple);
+  color: var(--lp-purple);
+}
+
+.lp-dash-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.lp-speed {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Live numbers stay monospace: a proportional face would make the
+   readout jitter as the digits change. */
+.lp-speed-value {
+  font-family: var(--lp-mono);
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.lp-speed-unit,
+.lp-gear-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lp-faint);
+}
+
+.lp-gear {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 56px;
+  padding: 2px 8px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lp-gear-value {
+  font-family: var(--lp-mono);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--lp-hi);
+  text-shadow: 0 0 14px rgba(var(--lp-accent-rgb), 0.6);
+}
+
+.lp-speed-bar {
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.lp-speed-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--lp-green), var(--lp-amber) 60%, var(--lp-red));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.lp-dash-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lp-faint);
+}
+
+.lp-dash-row b {
+  font-family: var(--lp-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Minimap ───────────────────────────────────────────────── */
+.lp-map {
+  position: absolute;
+  right: clamp(16px, 2.6vw, 36px);
+  bottom: 26px;
+  width: 256px;
+  padding: 10px 14px 10px;
+  border: 1px solid var(--lp-card-line);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 15, 20, 0.9), rgba(6, 7, 10, 0.9));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.lp-map-head,
+.lp-map-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--lp-muted);
+}
+
+.lp-map-foot {
+  margin-top: 4px;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.lp-sectors {
+  display: flex;
+  gap: 4px;
+}
+
+.lp-sector {
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.07);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.lp-sector[data-state="live"] {
+  color: #111;
+  background: var(--lp-amber);
+}
+
+.lp-sector[data-state="done"] {
+  color: #fff;
+  background: var(--lp-purple);
+  box-shadow: 0 0 12px rgba(180, 108, 255, 0.55);
+}
+
+.lp-map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 6px;
+  overflow: visible;
+}
+
+.lp-map-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lp-map-trail {
+  fill: none;
+  stroke: var(--lp-accent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0 1;
+  filter: drop-shadow(0 0 3px rgba(var(--lp-accent-rgb), 0.8));
+}
+
+.lp-map-sector {
+  fill: #0a0b0e;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.2;
+}
+
+.lp-map-start {
+  fill: var(--lp-red);
+}
+
+.lp-map-car {
+  fill: #fff;
+}
+
+.lp-map-car-halo {
+  fill: rgba(var(--lp-accent-rgb), 0.35);
+  animation: lp-ping 1.4s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes lp-ping {
+  from {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.lp-map-ghost {
+  fill: var(--lp-purple);
+  filter: drop-shadow(0 0 4px var(--lp-purple));
+}
+
+.lp-map-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lp-map-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.lp-map-legend i[data-k="ghost"] {
+  background: var(--lp-purple);
+}
+
+.lp-map-len {
+  margin-left: auto;
+}
+
+.lp-progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lp-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(var(--lp-accent-rgb), 0.6), var(--lp-accent));
+  box-shadow: 0 0 12px rgba(var(--lp-accent-rgb), 0.8);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ── Loader ────────────────────────────────────────────────── */
+.lp-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 22px;
+  background: radial-gradient(70% 60% at 50% 50%, #0d0e13, #040508 70%);
+  font-family: var(--lp-display);
+  transition:
+    opacity 0.8s ease 0.15s,
+    visibility 0s linear 0.95s;
+}
+
+.lp-loader.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.lp-loader-logo {
+  width: min(300px, 64vw);
+  height: auto;
+  animation: lp-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes lp-breathe {
+  50% {
+    opacity: 0.72;
+  }
+}
+
+.lp-loader-lights {
+  display: flex;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #0b0c10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* The real F1 start: five reds come on one by one. */
+.lp-loader-lights span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #2a0b0b;
+  animation: lp-redlight 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.32s);
+}
+
+@keyframes lp-redlight {
+  0%,
+  8% {
+    background: #2a0b0b;
+    box-shadow: none;
+  }
+  14%,
+  70% {
+    background: var(--lp-red);
+    box-shadow:
+      0 0 12px var(--lp-red),
+      0 0 30px rgba(255, 42, 31, 0.5);
+  }
+  80%,
+  100% {
+    background: #2a0b0b;
+    box-shadow: none;
+  }
+}
+
+.lp-loader-label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--lp-muted);
+}
+
+.lp-loader-label b {
+  margin-left: 6px;
+  font-family: var(--lp-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lp-loader-bar {
+  width: 220px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border-radius: 1px;
+}
+
+.lp-loader-bar i {
+  display: block;
+  height: 100%;
+  background: var(--lp-accent);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+/* ── Quotes: the big lines between stops ──────────────────── */
+/* Up while the car runs between two panels (Sections drives --v, and
+   --u: how far through its stretch the car is, 0 → 1). High on the
+   screen, clear of the car; on a phone, low, where the panels sit. */
+.lp-quote {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(112px, 16vh, 176px) clamp(20px, 5vw, 80px) 0;
+  text-align: center;
+  pointer-events: none;
+}
+
+.lp-quote[data-shown="0"] {
+  visibility: hidden;
+}
+
+/* Drifts up a touch, and grows a touch, as you scroll through it. */
+.lp-quote-inner {
+  position: relative;
+  max-width: min(1120px, 92vw);
+  margin: 0;
+  transform: translate3d(0, calc((0.5 - var(--u, 0.5)) * 44px), 0) scale(calc(0.975 + var(--u, 0.5) * 0.045));
+}
+
+/* A pool of dark behind the type, so it reads over any part of the
+   circuit — red kerbs and floodlights included. */
+.lp-quote-inner::before {
+  content: "";
+  position: absolute;
+  inset: -24% -14%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(4, 5, 8, 0.74), rgba(4, 5, 8, 0.38) 55%, rgba(4, 5, 8, 0));
+  opacity: var(--v, 0);
+}
+
+.lp-quote-mark,
+.lp-quote-text span,
+.lp-quote-text em,
+.lp-quote-by {
+  --c: clamp(0, calc(var(--v, 0) * 1.6 - var(--i, 0) * 0.14), 1);
+  display: block;
+  opacity: var(--c);
+  transform: translate3d(0, calc((1 - var(--c)) * 28px), 0);
+}
+
+.lp-quote-mark {
+  height: 0.42em;
+  font: 800 clamp(96px, 11vw, 180px)/1 var(--lp-display);
+  color: var(--lp-accent);
+  text-shadow: 0 0 44px rgba(var(--lp-accent-rgb), 0.6);
+}
+
+.lp-quote-text {
+  margin: 0;
+}
+
+.lp-quote-text p {
+  margin: 0;
+  font: 800 clamp(44px, 6.6vw, 112px)/0.98 var(--lp-display);
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-wrap: balance;
+  text-shadow:
+    0 6px 40px rgba(0, 0, 0, 0.75),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.lp-quote-text em {
+  font-style: normal;
+  color: var(--lp-hi);
+}
+
+.lp-quote-by {
+  margin-top: 20px;
+  font: 400 clamp(20px, 1.9vw, 30px)/1.2 var(--lp-brand);
+  color: var(--lp-muted);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+}
+
+/* ── Cut ───────────────────────────────────────────────────── */
+/* A long jump between stops fades the circuit and the copy through
+   black (LandingPage drives the opacity); the HUD stays on top. */
+.lp-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: var(--lp-bg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Arriving on a stop from the keyboard puts focus on its card. */
+.lp-card:focus {
+  outline: none;
+}
+
+.lp-card:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+}
+
+/* ── Autopilot ─────────────────────────────────────────────── */
+.lp-autopilot {
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 5px 5px 14px;
+  border: 1px solid rgba(var(--lp-accent-rgb), 0.55);
+  border-radius: 999px;
+  background: rgba(6, 7, 10, 0.88);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(-50%, -6px, 0);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.lp-autopilot[data-on="1"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translate3d(-50%, 0, 0);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.lp-autopilot-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lp-green);
+  box-shadow: 0 0 10px var(--lp-green);
+  animation: lp-blink 1.2s steps(2, start) infinite;
+}
+
+.lp-autopilot-stop {
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.lp-autopilot-stop:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.lp-autopilot-stop:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Stops menu ────────────────────────────────────────────── */
+/* Stands in for the chapter rail where there is no room for it. */
+.lp-stops {
+  display: none;
+}
+
+.lp-stops-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--lp-card-line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(14, 15, 20, 0.92), rgba(6, 7, 10, 0.92));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font: 600 14px/1 var(--lp-display);
+  cursor: pointer;
+}
+
+.lp-stops-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.lp-stops[data-open="1"] .lp-stops-btn {
+  border-color: rgba(var(--lp-accent-rgb), 0.75);
+}
+
+.lp-stops-icon {
+  display: grid;
+  gap: 3px;
+}
+
+.lp-stops-icon i {
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.lp-stops-count {
+  color: var(--lp-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-stops-count b {
+  font-weight: 700;
+  color: #fff;
+}
+
+.lp-stops-menu {
+  position: absolute;
+  right: 0;
+  bottom: 54px;
+  width: min(280px, calc(100vw - 24px));
+  max-height: min(70vh, 470px);
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--lp-card-line);
+  border-radius: 14px;
+  background: var(--lp-card);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.lp-stops-menu[hidden] {
+  display: none;
+}
+
+.lp-stops-menu ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-stop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--lp-muted);
+  font: 600 15px/1.2 var(--lp-display);
+  text-align: left;
+  cursor: pointer;
+}
+
+.lp-stop:hover,
+.lp-stop:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lp-stop:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+.lp-stop[data-state="live"] {
+  color: #fff;
+  background: rgba(var(--lp-accent-rgb), 0.2);
+}
+
+.lp-stop-n {
+  min-width: 22px;
+  font-size: 13px;
+  color: var(--lp-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-stop[data-state="done"] .lp-stop-n {
+  color: var(--lp-hi);
+}
+
+.lp-stops-links {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .lp-stops {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: block;
+  }
+}
+
+/* ── Touch screens: the hint says swipe ────────────────────── */
+.lp-hint-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .lp-mouse,
+  .lp-hint-mouse {
+    display: none;
+  }
+
+  .lp-hint-touch {
+    display: inline;
+  }
+}
+
+/* ── Smaller screens ───────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .lp-map {
+    display: none;
+  }
+}
+
+/* Shorter screens: tighten the cards so they clear the bottom HUD. */
+@media (max-height: 860px) and (min-width: 761px) {
+  .lp-card {
+    padding: 20px 24px 22px;
+  }
+
+  .lp-card-head {
+    margin-bottom: 10px;
+  }
+
+  .lp-title {
+    font-size: clamp(28px, 2.6vw, 38px);
+  }
+
+  .lp-body {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .lp-chips {
+    margin-top: 16px;
+  }
+
+  .lp-chip {
+    font-size: 14px;
+  }
+
+  .lp-stat {
+    display: none;
+  }
+
+  .lp-quote {
+    padding-top: 104px;
+  }
+
+  .lp-quote-text p {
+    font-size: clamp(40px, 5.8vw, 92px);
+  }
+}
+
+@media (max-width: 900px) {
+  .lp-chapters {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .lp-nav-link {
+    display: none;
+  }
+
+  .lp-topbar {
+    height: 72px;
+  }
+
+  .lp-brand-logo {
+    height: 44px;
+  }
+
+  .lp-nav-cta {
+    padding: 6px 13px 7px;
+    font-size: 17px;
+  }
+
+  .lp-lights {
+    top: 14px;
+  }
+
+  .lp-lights-pod {
+    gap: 7px;
+    padding: 6px 9px;
+  }
+
+  .lp-light {
+    width: 15px;
+    height: 15px;
+  }
+
+  .lp-lights-label {
+    font-size: 11.5px;
+  }
+
+  .lp-radio {
+    display: none;
+  }
+
+  .lp-dash {
+    bottom: 12px;
+    left: 12px;
+    width: 196px;
+    padding: 8px 11px 9px;
+    border-radius: 12px;
+  }
+
+  .lp-speed-value {
+    font-size: 34px;
+  }
+
+  .lp-gear-value {
+    font-size: 22px;
+  }
+
+  .lp-dash-row {
+    display: none;
+  }
+
+  /* The big hero logo would sit across the car on a phone: it stays
+     for screen readers (it is the page's h1) and the bar's logo
+     stands in for it from the first frame. */
+  .lp-hero-logo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .lp-hud[data-phase="grid"] .lp-brand {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lp-autopilot {
+    top: 78px;
+  }
+
+  .lp-stops-links {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 8px 4px 2px;
+    border-top: 1px solid var(--lp-card-line);
+  }
+
+  .lp-stops-links a {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    min-height: 42px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 17px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .lp-quote {
+    align-items: flex-end;
+    padding: 0 16px 132px;
+  }
+
+  .lp-quote-mark {
+    font-size: 92px;
+  }
+
+  .lp-quote-text p {
+    font-size: clamp(34px, 10.4vw, 50px);
+  }
+
+  .lp-quote-by {
+    margin-top: 12px;
+    font-size: 20px;
+  }
+
+  /* The copy is a card across the bottom of the screen. */
+  .lp-sec,
+  .lp-sec-right,
+  .lp-sec-center {
+    align-items: flex-end;
+    justify-content: center;
+    text-align: left;
+    padding: 84px 12px 112px;
+  }
+
+  .lp-sec-inner,
+  .lp-sec-hero .lp-sec-inner,
+  .lp-sec-finale .lp-sec-inner {
+    width: 100%;
+  }
+
+  .lp-card {
+    padding: 18px 18px 20px;
+    border-radius: 16px;
+  }
+
+  .lp-sec-center .lp-card::before {
+    left: 18%;
+    right: 18%;
+  }
+
+  .lp-sec-inner > *,
+  .lp-sec-right .lp-sec-inner > *,
+  .lp-sec-center .lp-sec-inner > *,
+  .lp-card > *,
+  .lp-sec-right .lp-card > *,
+  .lp-sec-center .lp-card > * {
+    transform: translate3d(0, calc((1 - var(--c)) * 18px), 0);
+  }
+
+  .lp-hero-logo {
+    margin-bottom: 10px;
+  }
+
+  .lp-hero-logo-img {
+    width: min(300px, 78vw);
+  }
+
+  .lp-title {
+    font-size: 27px;
+  }
+
+  .lp-title-xl {
+    font-size: 34px;
+  }
+
+  .lp-body {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .lp-chips {
+    margin-top: 14px;
+  }
+
+  .lp-chip {
+    font-size: 13.5px;
+  }
+
+  .lp-finale-actions {
+    justify-content: flex-start;
+  }
+
+  .lp-sec-center .lp-body {
+    margin-inline: 0;
+  }
+
+  .lp-stat,
+  .lp-step,
+  .lp-scroll-hint {
+    display: none;
+  }
+
+  .lp-btn {
+    font-size: 18px;
+  }
+
+  .lp-btn-lg {
+    padding: 11px 22px 12px;
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 380px) {
+  .lp-stops-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-sec-hero .lp-sec-inner > * {
+    animation: none;
+  }
+
+  .lp-quote-inner,
+  .lp-quote-mark,
+  .lp-quote-text span,
+  .lp-quote-text em,
+  .lp-quote-by {
+    transform: none;
+  }
+
+  .lp-mouse i,
+  .lp-autopilot-dot,
+  .lp-radio-wave i,
+  .lp-map-car-halo,
+  .lp-lights[data-state="amber"] .lp-light,
+  .lp-loader-lights span,
+  .lp-loader-logo {
+    animation: none;
+  }
+
+  .lp-loader-lights span {
+    background: var(--lp-red);
+  }
+}

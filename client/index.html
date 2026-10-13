@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- The CodeCaret logo on a racing-red tile (generated from
+         public/logo.png; the small sizes carry heavier strokes). -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- Installable: name, icons and the screen it opens on. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="CodeCaret is the typing simulator for code: race real C++, Python and JavaScript snippets against the clock, with live WPM telemetry, ghost laps and a podium for every snippet."
+    />
+    <!-- Link previews (chat apps, social posts). og-image.png is
+         rendered from the drawn composition in scripts/og-image.svg.
+         %SITE_URL% is filled from VITE_SITE_URL (see vite.config.js). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="CodeCaret: the typing simulator for code. A red race car below a line of C++ being typed."
+    />
+    <meta property="og:site_name" content="CodeCaret" />
+    <meta property="og:title" content="CodeCaret — the typing simulator for code" />
+    <meta
+      property="og:description"
+      content="Race real C++, Python and JavaScript snippets against the clock — live WPM telemetry, ghost laps and a podium for every snippet."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="%SITE_URL%/og-image.png" />
+    <title>CodeCaret — the typing simulator for code</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
