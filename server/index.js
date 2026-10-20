@@ -7,7 +7,7 @@ const compression = require("compression");
 const mongoose = require("mongoose");
 
 // ── Configuration, checked before anything else loads ───────
-const { assertEnv, IS_PRODUCTION } = require("./config/env");
+const { assertEnv, IS_PRODUCTION, clientOrigins, clientOrigin, DEV_CLIENT_ORIGIN } = require("./config/env");
 assertEnv();
 
 // ── Config modules ──────────────────────────────────────────
@@ -31,7 +31,8 @@ const app = express();
 app.disable("x-powered-by");
 
 /* ── CORS ─────────────────────────────────────────────────────
-   Production answers exactly one origin: CLIENT_URL.
+   Production answers only the origins in CLIENT_URL (see
+   clientOrigins in config/env.js).
 
    Development also answers any loopback origin, on any port. Vite
    takes 5173 if it can and silently moves to 5174, 5175… when it
@@ -42,10 +43,25 @@ app.disable("x-powered-by");
    server running?" against a server that was running fine. Nothing
    outside this machine can send a loopback Origin, so allowing them
    in development opens nothing. */
-const CORS_ORIGIN = (process.env.CLIENT_URL || "http://localhost:5173").replace(/\/+$/, "");
+const CORS_ORIGINS = new Set(clientOrigins().length > 0 ? clientOrigins() : [DEV_CLIENT_ORIGIN]);
 const LOOPBACK_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+console.log(
+  `🌐 CORS allows ${[...CORS_ORIGINS].join(", ")}${IS_PRODUCTION ? "" : " and any localhost port"}`
+);
 
-app.use(securityHeaders({ production: IS_PRODUCTION, clientUrl: CORS_ORIGIN }));
+/* A refused origin is logged once, naming what is allowed: a site
+   whose every request is blocked must not be a silent failure. */
+const refusedOrigins = new Set();
+function noteRefused(origin) {
+  if (refusedOrigins.has(origin) || refusedOrigins.size >= 50) return;
+  refusedOrigins.add(origin);
+  console.warn(
+    `⚠️  CORS refused ${origin}: it is not in CLIENT_URL (${[...CORS_ORIGINS].join(", ")}). ` +
+      "If this is your site, add it to CLIENT_URL."
+  );
+}
+
+app.use(securityHeaders({ production: IS_PRODUCTION, clientUrl: clientOrigin() }));
 app.use(compression());
 
 app.use(
@@ -54,9 +70,10 @@ app.use(
       /* No Origin at all: curl, server-to-server, same-origin. CORS is
          a browser rule, so there is nothing to enforce. */
       if (!origin) return callback(null, true);
-      if (origin === CORS_ORIGIN) return callback(null, true);
+      if (CORS_ORIGINS.has(origin)) return callback(null, true);
       if (!IS_PRODUCTION && LOOPBACK_ORIGIN.test(origin)) return callback(null, true);
       // Not allowed: answer without the header, so the browser refuses.
+      noteRefused(origin);
       return callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -180,10 +197,20 @@ app.use((_req, res, _next) => {
 // Centralized error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
+  const status = err.statusCode || err.status || 500;
+  /* A malformed or oversized body is the caller's mistake, not ours:
+     say so plainly, and keep it out of the error log. */
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ error: "Request body is not valid JSON" });
+  }
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ error: "Request body is too large" });
+  }
   console.error("💥 Unhandled error:", err.stack || err.message);
-  const status = err.statusCode || 500;
+  /* Client errors (4xx) keep their message; server errors hide theirs
+     in production, where it could describe internals. */
   res.status(status).json({
-    error: IS_PRODUCTION ? "Internal server error" : err.message,
+    error: IS_PRODUCTION && status >= 500 ? "Internal server error" : err.message,
   });
 });
 

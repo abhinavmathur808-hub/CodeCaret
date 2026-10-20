@@ -18,14 +18,44 @@ const IS_PRODUCTION = process.env.NODE_ENV === "production";
      node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))" */
 const MIN_SECRET_LENGTH = 32;
 
-const isHttpUrl = (value) => {
+/* The origin the client is served from in development (Vite). */
+const DEV_CLIENT_ORIGIN = "http://localhost:5173";
+
+/** An http(s) URL's origin, or null. */
+function originOf(value) {
   try {
     const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
+    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : null;
   } catch {
-    return false;
+    return null;
   }
-};
+}
+
+const clientEntries = (env) =>
+  String(env.CLIENT_URL || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+/**
+ * Every origin the client is served from, from CLIENT_URL.
+ *
+ * A browser's Origin header is exactly scheme://host[:port]. CLIENT_URL
+ * was compared to it as a raw string, so a value pasted with a trailing
+ * space, a path (https://example.com/signin) or a capital letter never
+ * matched — every request from the real site was refused by CORS, and
+ * nothing said why. Each entry is now reduced to its origin.
+ *
+ * A comma-separated list allows more than one, for example a custom
+ * domain alongside the *.vercel.app address. The first is the primary:
+ * emailed links and the GitHub callback use it.
+ */
+function clientOrigins(env = process.env) {
+  return [...new Set(clientEntries(env).map(originOf).filter(Boolean))];
+}
+
+/** The primary client origin: the base of emailed links and OAuth callbacks. */
+const clientOrigin = (env = process.env) => clientOrigins(env)[0] || DEV_CLIENT_ORIGIN;
 
 /**
  * Check the environment. Returns { errors, warnings }; the caller
@@ -40,17 +70,22 @@ function checkEnv(env = process.env) {
     if (!env[key]) errors.push(`${key} is required.`);
   }
 
-  if (env.CLIENT_URL && !isHttpUrl(env.CLIENT_URL)) {
-    errors.push("CLIENT_URL must be a full http(s) origin, e.g. https://codecaret.app.");
+  for (const entry of clientEntries(env)) {
+    const origin = originOf(entry);
+    if (!origin) {
+      errors.push(`CLIENT_URL entry "${entry}" must be a full http(s) origin, e.g. https://codecaret.app.`);
+    } else if (origin !== entry.replace(/\/+$/, "")) {
+      warnings.push(`CLIENT_URL entry "${entry}" is read as ${origin} (only the origin counts).`);
+    }
   }
 
   if (production) {
     if (env.JWT_SECRET && env.JWT_SECRET.length < MIN_SECRET_LENGTH) {
       errors.push(`JWT_SECRET must be at least ${MIN_SECRET_LENGTH} characters in production.`);
     }
-    if (!env.CLIENT_URL) {
+    if (clientEntries(env).length === 0) {
       errors.push("CLIENT_URL is required in production: it is the only origin CORS allows and the base of emailed links.");
-    } else if (!env.CLIENT_URL.startsWith("https://")) {
+    } else if (clientOrigins(env).some((o) => !o.startsWith("https://"))) {
       warnings.push("CLIENT_URL is not https. Sessions and passwords would cross the network unencrypted.");
     }
     if (!env.REDIS_URL) {
@@ -77,4 +112,12 @@ function assertEnv() {
   }
 }
 
-module.exports = { IS_PRODUCTION, checkEnv, assertEnv, MIN_SECRET_LENGTH };
+module.exports = {
+  IS_PRODUCTION,
+  checkEnv,
+  assertEnv,
+  clientOrigins,
+  clientOrigin,
+  DEV_CLIENT_ORIGIN,
+  MIN_SECRET_LENGTH,
+};

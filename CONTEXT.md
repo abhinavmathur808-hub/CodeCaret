@@ -737,7 +737,7 @@ npm run dev
 | `PORT` | | default 5000 |
 | `NODE_ENV` | | `production` enables strict checks, HSTS, generic errors and serving the client |
 | `JWT_EXPIRES_IN` | | default `7d` |
-| `CLIENT_URL` | prod | the CORS origin, the base of emailed links, and the GitHub `redirect_uri` base |
+| `CLIENT_URL` | prod | the CORS origin(s), the base of emailed links, and the GitHub `redirect_uri` base. Read as origins only (path, trailing slash and whitespace ignored); comma-separated for several sites, the first being primary. Refused origins are logged |
 | `REDIS_URL` | | rate limits, profile cache, session revocation |
 | `TRUST_PROXY` | | `1` behind one proxy; accepts true/false, a hop count or an address list |
 | `SERVE_CLIENT`, `CLIENT_DIST` | | serve the client (`true` / `false`) and its build path |

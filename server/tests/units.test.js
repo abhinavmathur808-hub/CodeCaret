@@ -162,3 +162,18 @@ test("production refuses weak or missing settings, development does not", () => 
   assert.match(checkEnv({ ...prod, CLIENT_URL: "codecaret.app" }).errors[0], /full http\(s\) origin/);
   assert.equal(checkEnv({ ...prod, REDIS_URL: undefined, SMTP_HOST: undefined }).warnings.length, 2);
 });
+
+test("CLIENT_URL is read as origins, however it was pasted", () => {
+  const { clientOrigins, clientOrigin, checkEnv } = require("../config/env");
+  const site = "https://code-caret.vercel.app";
+  for (const pasted of [site, `${site}/`, `${site} `, ` ${site}`, `${site}/signin`, "https://Code-Caret.vercel.app"]) {
+    assert.deepEqual(clientOrigins({ CLIENT_URL: pasted }), [site], JSON.stringify(pasted));
+  }
+  assert.deepEqual(clientOrigins({ CLIENT_URL: `${site}, https://codecaret.app` }), [site, "https://codecaret.app"]);
+  assert.equal(clientOrigin({ CLIENT_URL: `${site}/signin, https://codecaret.app` }), site);
+  assert.equal(clientOrigin({}), "http://localhost:5173");
+
+  const base = { JWT_SECRET: "x".repeat(40), MONGODB_URI: "mongodb://db/codecaret" };
+  assert.match(checkEnv({ ...base, CLIENT_URL: `${site}/signin` }).warnings[0], /read as https:\/\/code-caret\.vercel\.app/);
+  assert.deepEqual(checkEnv({ ...base, CLIENT_URL: site }).warnings, []);
+});

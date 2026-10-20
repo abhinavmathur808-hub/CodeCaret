@@ -127,8 +127,9 @@ Build the client with `VITE_SERVER_URL=https://api.your.domain` and deploy `clie
 - [ ] Redis is configured: it is needed for signing other devices out after a password change, and for shared rate limits.
 - [ ] SMTP is configured and `MAIL_FROM` is a sender your provider has verified.
 - [ ] OAuth:
-  - The Google client lists the production origin under *Authorized JavaScript origins*.
+  - The Google client lists the production origin under *Authorized JavaScript origins* (for example `https://code-caret.vercel.app`, no path or trailing slash). Without it, Google answers the button with a 403: a small fallback button appears and sign-in fails.
   - The GitHub OAuth app's callback URL is `https://your.domain/signin`.
+- [ ] Split hosting (client on Vercel, API on Render): the API's `CLIENT_URL` is the client's address, `https://code-caret.vercel.app`. If it is anything else, the browser blocks every API call from the site. The API logs `CORS refused …` with the origin it saw.
 - [ ] `VITE_SITE_URL` is set at build time, so link previews use absolute image URLs.
 - [ ] MongoDB is backed up, and its user has access only to this database.
 

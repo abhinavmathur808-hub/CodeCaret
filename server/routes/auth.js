@@ -16,6 +16,7 @@ const {
   passwordProblem,
 } = require("../utils/userProfile");
 const { sendMail } = require("../utils/mailer");
+const { clientOrigin } = require("../config/env");
 const { revokeSessions } = require("../utils/sessions");
 
 const router = express.Router();
@@ -212,7 +213,7 @@ const resetLimiter = rateLimit({
 
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT_URL = clientOrigin();
 
 router.post("/forgot-password", forgotLimiter, async (req, res) => {
   const reply = () =>
@@ -314,9 +315,7 @@ const GITHUB_UA = "CodeCaret-App";
    redirect_uri the client sent to /authorize — GitHub compares them
    and refuses the exchange if they differ. Derived from CLIENT_URL so
    there is one place to change when the app moves. */
-const GITHUB_REDIRECT_URI = `${
-  process.env.CLIENT_URL || "http://localhost:5173"
-}/signin`;
+const GITHUB_REDIRECT_URI = `${clientOrigin()}/signin`;
 
 /* ── Tracing ──────────────────────────────────────────────────
    OAuth fails in a browser redirect, far from anywhere a stack
