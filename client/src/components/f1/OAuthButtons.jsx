@@ -44,11 +44,11 @@ function newState() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
-function GithubMark() {
+function GithubMark({ className = "h-[1.05rem] w-[1.05rem]" }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className="h-[1.05rem] w-[1.05rem]"
+      className={className}
       fill="currentColor"
       aria-hidden="true"
     >
@@ -220,17 +220,33 @@ export default function OAuthButtons({ mode = "signin", onError }) {
         )}
 
         {showGithub && (
+          /* Drawn to match Google's button above, which is an iframe we
+             cannot restyle. Every value is Google's own, measured from
+             its stylesheet (filled_black, large, rectangular): a 40px
+             #202124 bar with 4px corners; a 36px white logo square inset
+             2px with 3px left corners; an 18px logo; a centred 14px/500
+             label in #e8eaed at 0.25px tracking, in Google's font stack;
+             and a 24% white hover layer (#565659). */
           <button
             type="button"
             onClick={startGithub}
             disabled={Boolean(busy)}
-            className="group flex w-full items-center justify-center gap-2.5 border border-white/15 bg-white/[0.04]
-                       px-4 py-3 text-[0.92rem] font-medium leading-none text-zinc-200
-                       transition-colors hover:border-white/30 hover:bg-white/[0.08]
+            className="flex h-10 w-full items-center rounded-[4px] bg-[#202124] pl-[2px] pr-3
+                       text-[14px] font-medium leading-none tracking-[0.25px] text-[#e8eaed]
+                       transition-colors hover:bg-[#565659]
+                       focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8ab4f8]
                        disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ fontFamily: '"Google Sans", arial, sans-serif' }}
           >
-            <GithubMark />
-            {busy === "github" ? "Connecting…" : `${verb} with GitHub`}
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-l-[3px] bg-white text-[#202124]"
+              aria-hidden="true"
+            >
+              <GithubMark className="h-[18px] w-[18px]" />
+            </span>
+            <span className="ml-3 flex-1 text-center">
+              {busy === "github" ? "Connecting…" : `${verb} with GitHub`}
+            </span>
           </button>
         )}
       </div>
