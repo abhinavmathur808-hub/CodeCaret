@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../context/useAuth";
@@ -137,6 +137,34 @@ export default function OAuthButtons({ mode = "signin", onError }) {
     window.location.href = `${GITHUB_AUTHORIZE}?${params}`;
   }, []);
 
+  /* ── The Google button's width ─────────────────────────────
+     Google draws the button itself, in an iframe, at a width given in
+     PIXELS: 200 to 400 (GsiButtonConfiguration.width). "100%" is not a
+     width it accepts — it logged "Provided button width is invalid" and
+     drew the narrowest standard button instead, and the personalized
+     "Continue as …" button is never shown below 200px.
+
+     So the slot is measured and the button drawn to fit it, clamped to
+     Google's range. It is redrawn only when the slot really changes
+     size: every redraw reloads Google's iframe. Until the first
+     measurement there is nothing to draw, so the slot just holds the
+     button's height and the page does not jump. */
+  const googleSlotRef = useRef(null);
+  const [googleWidth, setGoogleWidth] = useState(0);
+  useEffect(() => {
+    const slot = googleSlotRef.current;
+    if (!slot) return undefined;
+    const fit = (px) => Math.max(200, Math.min(400, Math.floor(px)));
+    const measure = () => {
+      const next = fit(slot.clientWidth);
+      setGoogleWidth((prev) => (Math.abs(prev - next) >= 4 ? next : prev));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(slot);
+    return () => ro.disconnect();
+  }, []);
+
   const showGoogle = Boolean(GOOGLE_CLIENT_ID);
   const showGithub = Boolean(GITHUB_CLIENT_ID);
   if (!showGoogle && !showGithub) return null;
@@ -152,21 +180,35 @@ export default function OAuthButtons({ mode = "signin", onError }) {
         <span className="h-px flex-1 bg-white/10" />
       </div>
 
-      <div className="mt-4 grid gap-2.5">
+      {/* At most 400px wide, Google's ceiling for its button, so the
+          two providers always line up at the same width. */}
+      <div className="mx-auto mt-4 grid w-full max-w-[400px] gap-2.5">
         {showGoogle && (
           <div
-            className={`cc-oauth-google ${busy ? "pointer-events-none opacity-50" : ""}`}
+            ref={googleSlotRef}
+            className={`cc-oauth-google flex min-h-[44px] justify-center ${busy ? "pointer-events-none opacity-50" : ""}`}
           >
-            <GoogleLogin
-              onSuccess={handleGoogle}
-              onError={() => report("Google sign-in was cancelled or failed")}
-              theme="filled_black"
-              shape="rectangular"
-              size="large"
-              width="100%"
-              text={mode === "signup" ? "signup_with" : "signin_with"}
-              logo_alignment="left"
-            />
+            {googleWidth > 0 && (
+              <GoogleLogin
+                onSuccess={handleGoogle}
+                onError={() => report("Google sign-in was cancelled or failed")}
+                theme="filled_black"
+                shape="rectangular"
+                size="large"
+                width={String(googleWidth)}
+                text={mode === "signup" ? "signup_with" : "signin_with"}
+                logo_alignment="left"
+                /* FedCM: the browser's own sign-in API. Google shows the
+                   personalized "Continue as …" button only when it can
+                   read the Google session — through third-party cookies,
+                   which many browsers block in this iframe (Edge's
+                   tracking prevention, Safari, Firefox, private windows),
+                   or through FedCM, which needs none. Off by default in
+                   Google's library; browsers without FedCM keep the
+                   ordinary popup flow. */
+                use_fedcm_for_button
+              />
+            )}
           </div>
         )}
 
