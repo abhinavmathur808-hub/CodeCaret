@@ -187,6 +187,13 @@ export default function OAuthButtons({ mode = "signin", onError }) {
           <div
             ref={googleSlotRef}
             className={`cc-oauth-google flex min-h-[44px] justify-center ${busy ? "pointer-events-none opacity-50" : ""}`}
+            /* Google's button is an iframe whose page declares no
+               color-scheme, while every theme here is color-scheme:
+               dark. On a mismatch the browser paints an opaque WHITE
+               backdrop behind the iframe so its text stays readable —
+               the white box around the dark button. Matching the
+               iframe's scheme keeps it transparent. */
+            style={{ colorScheme: "light" }}
           >
             {googleWidth > 0 && (
               <GoogleLogin
