@@ -443,3 +443,14 @@
     animation-duration: 2.4s;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Phones — below 768px, Tailwind's md breakpoint. Every rule here is
+   inside this query, so at 768px and wider none of it applies and the
+   laptop and desktop layout is exactly what it was.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  .sc-platform-name {
+    font-size: 0.7rem;
+  }
+}

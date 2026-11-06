@@ -770,3 +770,55 @@ a.std-step-driver:hover .std-step-name { text-decoration: underline; text-underl
 }
 
 .acct-rules li.is-met::before { content: "✓ "; }
+
+/* ══════════════════════════════════════════════════════════════
+   Phones — below 768px, Tailwind's md breakpoint. Every rule here is
+   inside this query, so at 768px and wider none of it applies and the
+   laptop and desktop layout is exactly what it was.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  /* The name gets the full width; the buttons drop to a row of their
+     own. Beside them, a name broke every couple of letters. */
+  .drv-head {
+    gap: 14px;
+  }
+
+  .drv-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 1.2rem;
+  }
+
+  .drv-name {
+    font-size: 1.75rem;
+  }
+
+  .drv-actions {
+    flex-basis: 100%;
+  }
+
+  .drv-actions > * {
+    flex: 1 1 0;
+  }
+
+  /* The chart's key goes under the chart, where it no longer runs into
+     the card's "last N code laps" note. */
+  .drv-chart {
+    margin-bottom: 26px;
+  }
+
+  .drv-chart-key {
+    top: auto;
+    bottom: -26px;
+  }
+
+  /* The calendar opens on the most recent months, scrolling back in
+     time, instead of on the oldest with this week off-screen. */
+  .activity-scroll {
+    direction: rtl;
+  }
+
+  .activity-scroll > svg {
+    direction: ltr;
+  }
+}

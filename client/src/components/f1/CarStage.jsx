@@ -90,7 +90,7 @@ export default function CarStage({
        fixed viewport-height panel that the form scrolls against. */
     <section
       ref={panelRef}
-      className="relative order-1 min-h-[52vh] lg:sticky lg:top-0 lg:h-screen lg:self-start"
+      className="relative order-1 min-h-[52vh] max-md:min-h-[42vh] lg:sticky lg:top-0 lg:h-screen lg:self-start"
     >
       {/* The circuit is lit behind the logo and the zoom buttons; this
           shades the top of the stage so both stay readable over it. */}
@@ -111,7 +111,7 @@ export default function CarStage({
           className="pointer-events-auto inline-block rounded-md transition-opacity hover:opacity-80
                      focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E10600]"
         >
-          <BrandLogo tone="light" alt="" className="h-20 w-auto sm:h-24" />
+          <BrandLogo tone="light" alt="" className="h-20 w-auto max-sm:h-14 sm:h-24" />
         </Link>
       </div>
 

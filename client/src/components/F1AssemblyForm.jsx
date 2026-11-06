@@ -257,7 +257,7 @@ export default function F1AssemblyForm() {
           Every field you complete bolts another part onto your car.
         </p>
 
-        <ol className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2">
+        <ol className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 max-md:hidden">
           {STAGE_LABELS.map((label, i) => (
             <li key={label} className="flex items-center gap-2">
               <span
@@ -422,7 +422,7 @@ export default function F1AssemblyForm() {
                   ))}
                 </div>
                 <span
-                  className="font-mono text-[0.56rem] tracking-[0.2em] uppercase"
+                  className="font-mono text-[0.56rem] tracking-[0.2em] uppercase max-md:text-[0.7rem]"
                   style={{ color: strength.color }}
                 >
                   {strength.label}
@@ -466,7 +466,7 @@ export default function F1AssemblyForm() {
               </ul>
 
               {capsOn && (
-                <p className="mt-2 font-mono text-[0.6rem] tracking-[0.14em] text-amber-300/90 uppercase">
+                <p className="mt-2 font-mono text-[0.6rem] tracking-[0.14em] text-amber-300/90 uppercase max-md:text-[0.7rem]">
                   Caps lock is on
                 </p>
               )}

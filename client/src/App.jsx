@@ -2,6 +2,7 @@ import { lazy, Suspense, useLayoutEffect } from "react";
 import { Routes, Route, useLocation, useNavigationType, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import UsernameSelectionModal from "./components/UsernameSelectionModal";
+import MobileNotice from "./components/MobileNotice";
 import { useAuth } from "./context/useAuth";
 import OffTrackArt from "./components/OffTrackArt";
 
@@ -92,6 +93,8 @@ function App() {
           must outlive whichever one started it. Renders nothing
           unless a sign-up is actually being held. */}
       <UsernameSelectionModal />
+      {/* Phones only (hidden from md up): the site is built for a laptop. */}
+      <MobileNotice />
       <ScrollToTop />
       <Suspense fallback={<PageFallback />}>
         <Routes>

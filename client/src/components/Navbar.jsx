@@ -29,7 +29,7 @@ export default function Navbar() {
           className="flex shrink-0 items-center rounded-md transition-opacity hover:opacity-80
                      focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]"
         >
-          <BrandLogo alt="" className="h-9 w-auto sm:h-11" />
+          <BrandLogo alt="" className="h-9 w-auto max-sm:h-8 sm:h-11" />
         </Link>
 
         {/* ── Nav Links ────────────────────────────────── */}
@@ -69,7 +69,7 @@ export default function Navbar() {
               </NavLink>
               <Link
                 to="/signup"
-                className="ml-1 sm:ml-2 px-3 sm:px-4 py-1.5 whitespace-nowrap text-[0.9rem] sm:text-[0.95rem] leading-none bg-[var(--color-accent)] text-[var(--color-on-accent)] rounded-md
+                className="ml-1 sm:ml-2 px-3 max-sm:px-2 sm:px-4 py-1.5 whitespace-nowrap text-[0.9rem] max-sm:text-[0.8rem] sm:text-[0.95rem] leading-none bg-[var(--color-accent)] text-[var(--color-on-accent)] rounded-md
                            hover:brightness-110 transition-all
                            shadow-[0_0_12px_rgba(var(--cc-accent-rgb),0.25)]"
               >
@@ -89,7 +89,7 @@ function NavLink({ to, active, children }) {
     <Link
       to={to}
       aria-current={active ? "page" : undefined}
-      className={`px-2 sm:px-3 py-1.5 whitespace-nowrap text-[0.9rem] sm:text-[0.95rem] leading-none rounded-md transition-all
+      className={`px-2 max-sm:px-1 sm:px-3 py-1.5 whitespace-nowrap text-[0.9rem] max-sm:text-[0.8rem] sm:text-[0.95rem] leading-none rounded-md transition-all
         ${
           active
             ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10"

@@ -175,7 +175,7 @@ export default function SignInPage() {
 
         {/* Systems check. Each line reports OK in turn, then the last one
             waits on you — which is exactly what a real grid check does. */}
-        <ol className="mt-5 grid gap-2 font-mono text-[0.68rem] tracking-[0.12em] uppercase">
+        <ol className="mt-5 grid gap-2 font-mono text-[0.68rem] tracking-[0.12em] uppercase max-md:hidden">
           {BOOT_LINES.map((line, i) => {
             const done = booted > i;
             return (
@@ -323,7 +323,7 @@ export default function SignInPage() {
           }
           below={
             capsOn && (
-              <p className="mt-2 font-mono text-[0.6rem] tracking-[0.14em] text-amber-300/90 uppercase">
+              <p className="mt-2 font-mono text-[0.6rem] tracking-[0.14em] text-amber-300/90 uppercase max-md:text-[0.7rem]">
                 Caps lock is on
               </p>
             )

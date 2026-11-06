@@ -57,7 +57,7 @@ export function ReadoutHeader({ label, tally, reduced }) {
         />
       </span>
       <span className="cc-brand text-[1.05rem] leading-none">{label}</span>
-      <span className="ml-auto font-mono text-[0.6rem] tracking-[0.28em] tabular-nums text-white/35 uppercase">
+      <span className="ml-auto font-mono text-[0.6rem] tracking-[0.28em] tabular-nums text-white/35 uppercase max-md:text-[0.7rem]">
         {tally}
       </span>
     </div>

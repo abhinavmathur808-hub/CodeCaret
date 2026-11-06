@@ -47,7 +47,7 @@ export default function TelemetryField({
     <div className="relative pl-8">
       <span
         aria-hidden="true"
-        className="absolute top-px left-0 font-mono text-[0.62rem] tabular-nums transition-colors duration-300"
+        className="absolute top-px left-0 font-mono text-[0.62rem] tabular-nums transition-colors duration-300 max-md:text-[0.7rem]"
         style={{ color }}
       >
         {String(index).padStart(2, "0")}
@@ -62,7 +62,7 @@ export default function TelemetryField({
         </label>
         <span
           aria-hidden="true"
-          className="font-mono text-[0.56rem] tracking-[0.22em] uppercase transition-colors duration-300"
+          className="font-mono text-[0.56rem] tracking-[0.22em] uppercase transition-colors duration-300 max-md:text-[0.7rem]"
           style={{ color }}
         >
           {text}
@@ -126,7 +126,7 @@ export default function TelemetryField({
             <span />
           )}
           {counter && (
-            <span className="shrink-0 font-mono text-[0.6rem] tabular-nums text-white/30">
+            <span className="shrink-0 font-mono text-[0.6rem] tabular-nums text-white/30 max-md:text-[0.7rem]">
               {counter}
             </span>
           )}
