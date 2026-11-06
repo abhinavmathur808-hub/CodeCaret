@@ -115,8 +115,8 @@
 
 /* Feature cards ride high, clear of the dash (bottom left) and the
    minimap (bottom right) whichever side they are on. Phones keep
-   their bottom sheet (see the max-width: 760px block). */
-@media (min-width: 761px) {
+   their bottom sheet (see the max-width: 767.98px block). */
+@media (min-width: 768px) {
   .lp-sec:not(.lp-sec-hero):not(.lp-sec-finale) {
     align-items: flex-start;
     padding-top: 104px;
@@ -1632,7 +1632,7 @@
 }
 
 /* Shorter screens: tighten the cards so they clear the bottom HUD. */
-@media (max-height: 860px) and (min-width: 761px) {
+@media (max-height: 860px) and (min-width: 768px) {
   .lp-card {
     padding: 20px 24px 22px;
   }
@@ -1678,7 +1678,8 @@
   }
 }
 
-@media (max-width: 760px) {
+/* ── Phones (under 768px) ──────────────────────────────────── */
+@media (max-width: 767.98px) {
   .lp-nav-link {
     display: none;
   }
@@ -1688,12 +1689,12 @@
   }
 
   .lp-brand-logo {
-    height: 44px;
+    height: 40px;
   }
 
   .lp-nav-cta {
-    padding: 6px 13px 7px;
-    font-size: 17px;
+    padding: 6px 12px 7px;
+    font-size: 16px;
   }
 
   .lp-lights {
@@ -1711,27 +1712,61 @@
   }
 
   .lp-lights-label {
-    font-size: 11.5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    letter-spacing: 0.01em;
   }
 
   .lp-radio {
     display: none;
   }
 
+  /* A compact dash, so the copy card has room above it. */
   .lp-dash {
     bottom: 12px;
     left: 12px;
-    width: 196px;
-    padding: 8px 11px 9px;
+    width: 172px;
+    padding: 7px 10px 8px;
     border-radius: 12px;
   }
 
+  .lp-shift {
+    gap: 3px;
+  }
+
+  .lp-shift i {
+    height: 5px;
+  }
+
+  .lp-dash-main {
+    margin-top: 6px;
+  }
+
+  .lp-speed {
+    gap: 6px;
+  }
+
   .lp-speed-value {
-    font-size: 34px;
+    font-size: 30px;
+  }
+
+  .lp-speed-unit,
+  .lp-gear-label {
+    font-size: 12px;
+  }
+
+  .lp-gear {
+    min-width: 44px;
+    padding: 1px 6px 4px;
+    border-radius: 7px;
   }
 
   .lp-gear-value {
-    font-size: 22px;
+    font-size: 20px;
+  }
+
+  .lp-speed-bar {
+    margin-top: 7px;
   }
 
   .lp-dash-row {
@@ -1782,7 +1817,7 @@
 
   .lp-quote {
     align-items: flex-end;
-    padding: 0 16px 132px;
+    padding: 0 16px 120px;
   }
 
   .lp-quote-mark {
@@ -1798,14 +1833,15 @@
     font-size: 20px;
   }
 
-  /* The copy is a card across the bottom of the screen. */
+  /* The copy is a card across the bottom of the screen, with a clear
+     gap above the dash and the Stops button. */
   .lp-sec,
   .lp-sec-right,
   .lp-sec-center {
     align-items: flex-end;
     justify-content: center;
     text-align: left;
-    padding: 84px 12px 112px;
+    padding: 84px 12px 108px;
   }
 
   .lp-sec-inner,
@@ -1815,13 +1851,48 @@
   }
 
   .lp-card {
-    padding: 18px 18px 20px;
+    padding: 16px 16px 18px;
     border-radius: 16px;
+  }
+
+  .lp-card::before {
+    top: 18px;
+    bottom: 18px;
   }
 
   .lp-sec-center .lp-card::before {
     left: 18%;
     right: 18%;
+  }
+
+  .lp-card-head {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .lp-sector-badge {
+    min-width: 36px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 7px;
+    font-size: 13px;
+  }
+
+  .lp-tag {
+    font-size: 18px;
+  }
+
+  .lp-tag-finale {
+    margin-bottom: 8px;
+  }
+
+  .lp-kicker {
+    margin-bottom: 6px;
+    font-size: 17px;
+  }
+
+  .lp-hero-tagline {
+    font-size: 26px;
   }
 
   .lp-sec-inner > *,
@@ -1830,7 +1901,7 @@
   .lp-card > *,
   .lp-sec-right .lp-card > *,
   .lp-sec-center .lp-card > * {
-    transform: translate3d(0, calc((1 - var(--c)) * 18px), 0);
+    transform: translate3d(0, calc((1 - var(--c)) * 12px), 0);
   }
 
   .lp-hero-logo {
@@ -1842,29 +1913,46 @@
   }
 
   .lp-title {
-    font-size: 27px;
+    font-size: 25px;
   }
 
   .lp-title-xl {
-    font-size: 34px;
+    font-size: 31px;
   }
 
   .lp-body {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 15px;
-    line-height: 1.55;
+    line-height: 1.5;
   }
 
   .lp-chips {
-    margin-top: 14px;
+    gap: 6px;
+    margin-top: 12px;
   }
 
   .lp-chip {
-    font-size: 13.5px;
+    padding: 3px 9px 4px;
+    font-size: 12.5px;
   }
 
+  /* The two buttons share a row when they fit, and fill it. */
+  .lp-hero-actions,
   .lp-finale-actions {
     justify-content: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .lp-hero-actions .lp-btn,
+  .lp-finale-actions .lp-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .lp-finale-note {
+    margin-top: 12px;
+    font-size: 16px;
   }
 
   .lp-sec-center .lp-body {
@@ -1877,18 +1965,273 @@
     display: none;
   }
 
-  .lp-btn {
-    font-size: 18px;
-  }
-
+  .lp-btn,
   .lp-btn-lg {
-    padding: 11px 22px 12px;
-    font-size: 19px;
+    gap: 8px;
+    padding: 10px 14px 11px;
+    font-size: 17px;
   }
 }
 
+/* Short phones (an iPhone SE and the like): a little tighter still, so
+   the longest cards clear the top bar. Phones on their side override
+   all of this in the next block. */
+@media (max-width: 767.98px) and (max-height: 620px) {
+  .lp-sec,
+  .lp-sec-right,
+  .lp-sec-center {
+    padding-top: 76px;
+  }
+
+  .lp-card {
+    padding: 14px 14px 16px;
+  }
+
+  .lp-hero-tagline {
+    font-size: 24px;
+  }
+
+  .lp-title {
+    font-size: 23px;
+  }
+
+  .lp-title-xl {
+    font-size: 27px;
+  }
+
+  .lp-body {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .lp-hero-actions,
+  .lp-finale-actions {
+    margin-top: 12px;
+  }
+
+  .lp-btn,
+  .lp-btn-lg {
+    padding: 9px 12px 10px;
+    font-size: 16px;
+  }
+
+  .lp-finale-note {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+}
+
+/* Phones on their side: the screen is too short for a bottom sheet.
+   The card sits just under the top bar, beside the Stops button, and
+   the dash steps aside to make room for it. */
+@media (max-width: 767.98px) and (max-height: 500px) {
+  .lp-loader {
+    gap: 14px;
+  }
+
+  .lp-loader-logo {
+    width: min(300px, 64vw, 50vh);
+  }
+
+  .lp-topbar {
+    height: 56px;
+  }
+
+  .lp-brand-logo {
+    height: 34px;
+  }
+
+  .lp-nav-cta {
+    padding: 5px 12px 6px;
+    font-size: 15px;
+  }
+
+  .lp-lights {
+    top: 6px;
+    gap: 3px;
+  }
+
+  .lp-lights-pod {
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 11px;
+  }
+
+  .lp-light {
+    width: 12px;
+    height: 12px;
+  }
+
+  .lp-lights-label {
+    padding: 1px 8px;
+  }
+
+  .lp-autopilot {
+    top: 60px;
+  }
+
+  .lp-dash {
+    display: none;
+  }
+
+  .lp-stops-menu {
+    max-height: calc(100vh - 128px);
+    max-height: calc(100dvh - 128px);
+  }
+
+  .lp-sec,
+  .lp-sec-right,
+  .lp-sec-center {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 62px 170px 12px 12px;
+  }
+
+  .lp-card {
+    padding: 12px 16px 14px;
+  }
+
+  .lp-card::before {
+    top: 14px;
+    bottom: 14px;
+  }
+
+  .lp-card-head {
+    margin-bottom: 6px;
+  }
+
+  .lp-tag {
+    font-size: 17px;
+  }
+
+  .lp-tag-finale {
+    margin-bottom: 6px;
+  }
+
+  .lp-kicker {
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+
+  .lp-hero-tagline {
+    font-size: 23px;
+  }
+
+  .lp-title {
+    font-size: 22px;
+  }
+
+  .lp-title-xl {
+    font-size: 26px;
+  }
+
+  .lp-body {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .lp-chips {
+    margin-top: 10px;
+  }
+
+  .lp-hero-actions,
+  .lp-finale-actions {
+    margin-top: 12px;
+  }
+
+  .lp-btn,
+  .lp-btn-lg {
+    padding: 8px 14px 9px;
+    font-size: 16px;
+  }
+
+  .lp-finale-note {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .lp-quote {
+    align-items: center;
+    padding: 56px 16px 16px;
+  }
+
+  .lp-quote-mark {
+    font-size: 64px;
+  }
+
+  .lp-quote-text p {
+    font-size: clamp(28px, 10.5vh, 42px);
+  }
+
+  .lp-quote-by {
+    margin-top: 8px;
+    font-size: 17px;
+  }
+}
+
+/* The shortest phones on their side (320px tall): the chips step out
+   so the longest cards still fit under the top bar. */
+@media (max-width: 767.98px) and (max-height: 340px) {
+  .lp-sec,
+  .lp-sec-right,
+  .lp-sec-center {
+    padding-top: 58px;
+    padding-bottom: 8px;
+  }
+
+  .lp-card {
+    padding: 10px 14px 12px;
+  }
+
+  .lp-chips {
+    display: none;
+  }
+
+  .lp-title-xl {
+    font-size: 24px;
+  }
+
+  .lp-body {
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+
+  .lp-btn,
+  .lp-btn-lg {
+    padding: 7px 12px 8px;
+  }
+
+  .lp-finale-note {
+    margin-top: 6px;
+  }
+}
+
+/* Narrow phones: the lights' label keeps clear of the Start button. */
 @media (max-width: 380px) {
   .lp-stops-label {
+    display: none;
+  }
+
+  .lp-lights-label {
+    padding: 2px 6px;
+    letter-spacing: 0;
+  }
+
+  .lp-nav-cta {
+    padding-inline: 10px;
+  }
+}
+
+/* Too narrow for the label at all: the lamps' colour still tells it. */
+@media (max-width: 340px) {
+  .lp-lights-label {
+    display: none;
+  }
+}
+
+@media (max-width: 300px) {
+  .lp-lights {
     display: none;
   }
 }
